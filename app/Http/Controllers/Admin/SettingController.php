@@ -9,7 +9,11 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Coupon;
 use App\Models\Order;
+use App\Models\Review;
+use App\Models\Contact;
 use App\Models\Blog;
+use App\Models\Comment;
+use App\Models\Reply;
 use App\Models\Report;
 use App\Models\Mail;
 use App\Models\Relation;
@@ -75,13 +79,17 @@ class SettingController extends Controller {
     }
     public function delete ( Request $req ) {
 
-        $table = trim(strtolower($req->table));
+        $table = trim(strtolower($req->item));
 
         if ( $table == 'categories' ) { Category::query()->delete(); }
         if ( $table == 'products' ) { Product::query()->delete(); }
         if ( $table == 'coupons' ) { Coupon::query()->delete(); }
         if ( $table == 'orders' ) { Order::query()->delete(); }
+        if ( $table == 'reviews' ) { Review::query()->delete(); }
+        if ( $table == 'contacts' ) { Contact::query()->delete(); }
         if ( $table == 'blogs' ) { Blog::query()->delete(); }
+        if ( $table == 'comments' ) { Comment::query()->delete(); }
+        if ( $table == 'replies' ) { Reply::query()->delete(); }
         if ( $table == 'reports' ) { Report::query()->delete(); }
         if ( $table == 'mails' ) { Mail::query()->delete(); }
         if ( $table == 'messages' ) { Relation::query()->delete(); Message::query()->delete(); }

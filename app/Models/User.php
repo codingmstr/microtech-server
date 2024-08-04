@@ -45,6 +45,8 @@ class User extends Authenticatable {
         'allow_replies',
         'allow_login',
         'active',
+        'login_at',
+        'remember_token',
     ];
     protected $hidden = [
         'password',

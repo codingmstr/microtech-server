@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\AdminResource;
 use Illuminate\Support\Facades\Hash;
+use App\Models\File;
 
 class AccountController extends Controller {
 
@@ -31,8 +32,9 @@ class AccountController extends Controller {
         }
         if ( $req->file('image_file') ) {
 
-            Storage::delete($user->image);
-            $user->image = $this->upload_file($req->file('image_file'), 'user');
+            $file_id = File::where('table', 'user')->where('column', $user->id)->first()?->id;
+            $this->delete_files([$file_id], 'user');
+            $this->upload_files([$req->file('image_file')], 'user', $user->id);
 
         }
         $data = [
@@ -47,6 +49,7 @@ class AccountController extends Controller {
         ];
 
         $user->update($data);
+        $user = AdminResource::make( $user );
         return $this->success(['user' => $user]);
 
     }
@@ -54,14 +57,8 @@ class AccountController extends Controller {
 
         $user = $this->user();
 
-        $validator = Validator::make($req->all(), [
-            'password' => ['required', 'min:6', 'max:255'],
-        ]);
-        if ( $validator->fails() ) {
-            return $this->failed($validator->errors());
-        }
         if ( !Hash::check($req->old_password, $user->password) ) {
-            return $this->failed(['old_password' => 'not correct']);
+            return $this->failed(['password' => 'not correct']);
         }
 
         $user->update(['password' => Hash::make($req->password)]);

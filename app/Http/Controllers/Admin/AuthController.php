@@ -30,6 +30,7 @@ class AuthController extends Controller {
 
         }
 
+        $user->update(['login_at' => $this->date()]);
         $token = $user->createToken($req->userAgent())->plainTextToken;
         $user = AdminResource::make($user);
 
