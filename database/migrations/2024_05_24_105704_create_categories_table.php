@@ -10,6 +10,8 @@ return new class extends Migration {
 
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
+            $table->integer('admin_id')->default(0);
+            $table->integer('vendor_id')->default(0);
             $table->string('name')->unique();
             $table->string('slug')->unique();
             $table->string('company')->nullable();
@@ -20,6 +22,7 @@ return new class extends Migration {
             $table->boolean('allow_products')->default(true);
             $table->boolean('allow_orders')->default(true);
             $table->boolean('allow_coupons')->default(true);
+            $table->boolean('allow_reviews')->default(true);
             $table->boolean('active')->default(true);
             $table->timestamps();
             $table->softDeletes();

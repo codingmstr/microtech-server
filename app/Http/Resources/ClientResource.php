@@ -17,11 +17,11 @@ class ClientResource extends JsonResource {
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
-            'password' => '?',
             'age' => $this->age,
             'language' => $this->language,
             'country' => $this->country,
             'city' => $this->city,
+            'street' => $this->street,
             'ip' => $this->ip,
             'agent' => $this->agent,
             'balance' => $this->balance,
@@ -35,6 +35,8 @@ class ClientResource extends JsonResource {
             'allow_dislikes' => $this->allow_dislikes,
             'allow_comments' => $this->allow_comments,
             'allow_replies' => $this->allow_replies,
+            'allow_reports' => $this->allow_reports,
+            'allow_statistics' => $this->allow_statistics,
             'allow_login' => $this->allow_login,
             'active' => $this->active,
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
@@ -42,6 +44,8 @@ class ClientResource extends JsonResource {
             'login_at' => $this->login_at?->format('Y-m-d H:i:s'),
             'image' => $image,
             'info' => ['name' => $this->name, 'image' => $image],
+            'orders' => count($this->orders),
+            'reviews' => count($this->reviews),
         ];
 
     }

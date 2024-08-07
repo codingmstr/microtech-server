@@ -10,6 +10,8 @@ return new class extends Migration {
 
         Schema::create('blogs', function (Blueprint $table) {
             $table->id();
+            $table->integer('admin_id')->default(0);
+            $table->integer('vendor_id')->default(0);
             $table->string('title')->nullable();
             $table->string('slug')->nullable();
             $table->longText('description')->nullable();

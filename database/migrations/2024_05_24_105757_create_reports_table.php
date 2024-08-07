@@ -10,6 +10,8 @@ return new class extends Migration {
 
         Schema::create('reports', function (Blueprint $table) {
             $table->id();
+            $table->integer('admin_id')->default(0);
+            $table->integer('vendor_id')->default(0);
             $table->integer('user_id')->default(0);
             $table->string('action_table')->nullable();
             $table->integer('action_column')->default(0);

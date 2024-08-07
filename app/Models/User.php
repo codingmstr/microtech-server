@@ -13,6 +13,7 @@ class User extends Authenticatable {
     protected $fillable = [
         'role',
         'admin_id',
+        'vendor_id',
         'name',
         'email',
         'phone',
@@ -21,11 +22,14 @@ class User extends Authenticatable {
         'language',
         'country',
         'city',
+        'street',
+        'location',
         'age',
         'ip',
         'agent',
         'notes',
         'salary',
+        'balance',
         'supervisor',
         'allow_categories',
         'allow_products',
@@ -36,7 +40,7 @@ class User extends Authenticatable {
         'allow_contacts',
         'allow_clients',
         'allow_statistics',
-        'allow_chats',
+        'allow_messages',
         'allow_mails',
         'allow_reviews',
         'allow_likes',
@@ -56,9 +60,19 @@ class User extends Authenticatable {
         'login_at' => 'datetime',
     ];
 
+    public function admin () {
+
+        return $this->belongsTo(User::class, 'admin_id');
+
+    }
+    public function vendor () {
+
+        return $this->belongsTo(User::class, 'vendor');
+
+    }
     public function orders () {
 
-        return $this->hasMany(Order::class);
+        return $this->hasMany(Order::class, 'client_id');
 
     }
     public function reviews () {
@@ -74,6 +88,16 @@ class User extends Authenticatable {
     public function replies () {
 
         return $this->hasMany(Reply::class);
+
+    }
+    public function vendor_products () {
+
+        return $this->hasMany(Product::class, 'vendor_id');
+
+    }
+    public function vendor_orders () {
+
+        return $this->hasMany(Order::class, 'vendor_id');
 
     }
 

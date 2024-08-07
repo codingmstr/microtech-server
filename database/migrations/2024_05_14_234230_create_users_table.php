@@ -11,6 +11,7 @@ return new class extends Migration {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->integer('admin_id')->default(0);
+            $table->integer('vendor_id')->default(0);
             $table->enum('role', [1, 2, 3]);
             $table->string('name')->nullable();
             $table->string('email')->unique();
@@ -18,6 +19,8 @@ return new class extends Migration {
             $table->string('phone')->nullable();
             $table->string('country')->nullable();
             $table->string('city')->nullable();
+            $table->string('street')->nullable();
+            $table->string('location')->nullable();
             $table->string('language')->nullable();
             $table->string('ip')->nullable();
             $table->string('agent')->nullable();

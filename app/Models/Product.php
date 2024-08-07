@@ -10,32 +10,55 @@ class Product extends Model {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'admin_id',
+        'vendor_id',
         'category_id',
         'name',
         'company',
         'phone',
+        'language',
         'country',
         'city',
+        'street',
         'location',
         'old_price',
         'new_price',
         'description',
         'details',
+        'availability',
+        'policy',
+        'rules',
+        'safety',
         'includes',
         'notes',
         'rate',
+        'allow_reviews',
         'allow_orders',
         'allow_coupons',
-        'allow_reviews',
         'active',
     ];
     protected $casts = [
         'includes' => 'json'
     ];
 
+    public function admin () {
+
+        return $this->belongsTo(User::class, 'admin_id');
+
+    }
+    public function vendor () {
+
+        return $this->belongsTo(User::class, 'vendor_id');
+
+    }
     public function category () {
 
         return $this->belongsTo(Category::class);
+
+    }
+    public function reviews () {
+
+        return $this->hasMany(Review::class);
 
     }
     public function orders () {
@@ -43,9 +66,9 @@ class Product extends Model {
         return $this->hasMany(Order::class);
 
     }
-    public function reviews () {
+    public function coupons () {
 
-        return $this->hasMany(Review::class);
+        return $this->hasMany(Coupon::class);
 
     }
 

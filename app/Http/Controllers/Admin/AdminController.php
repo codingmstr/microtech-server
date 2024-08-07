@@ -16,8 +16,9 @@ class AdminController extends Controller {
         $users = User::where('role', 1)->where('super', false)->where('id', '!=', $this->user()->id);
         if ( !$this->user()->super ) $users = $users->where('admin_id', $this->user()->id);
 
-        $users = AdminResource::collection( $users->get() );
-        return $this->success(['admins' => $users]);
+        $data = $this->paginate( $users, $req );
+        $items = AdminResource::collection( $data['items'] );
+        return $this->success(['items' => $items, 'total' => $data['total']]);
 
     }
     public function show ( Request $req, User $user ) {
@@ -25,8 +26,8 @@ class AdminController extends Controller {
         if ( $user->role != 1 || $user->super || $user->id == $this->user()->id ) return $this->failed(['admin' => 'not exists']);
         if ( !$this->user()->super && $user->admin_id != $this->user()->id ) return $this->failed(['admin' => 'not exists']);
 
-        $user = AdminResource::make( $user );
-        return $this->success(['admin' => $user]);
+        $item = AdminResource::make( $user );
+        return $this->success(['item' => $item]);
 
     }
     public function store ( Request $req ) {
@@ -53,8 +54,8 @@ class AdminController extends Controller {
             'phone' => $req->phone,
             'country' => $req->country,
             'city' => $req->city,
-            'location' => $req->location,
-            'notes' => $req->notes ?? '',
+            'street' => $req->street,
+            'notes' => $req->notes,
             'ip' => $req->ip(),
             'agent' => $req->userAgent(),
             'allow_categories' => $this->bool($req->allow_categories),
@@ -62,6 +63,8 @@ class AdminController extends Controller {
             'allow_coupons' => $this->bool($req->allow_coupons),
             'allow_orders' => $this->bool($req->allow_orders),
             'allow_blogs' => $this->bool($req->allow_blogs),
+            'allow_comments' => $this->bool($req->allow_comments),
+            'allow_replies' => $this->bool($req->allow_replies),
             'allow_reports' => $this->bool($req->allow_reports),
             'allow_reviews' => $this->bool($req->allow_reviews),
             'allow_contacts' => $this->bool($req->allow_contacts),
@@ -88,7 +91,6 @@ class AdminController extends Controller {
         $validator = Validator::make($req->all(), [
             'name' => ['required', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email,' . $user->id],
-            'password' => ['required', 'max:255'],
         ]);
         if ( $validator->fails() ) {
 
@@ -102,8 +104,10 @@ class AdminController extends Controller {
             $this->upload_files([$req->file('image_file')], 'user', $user->id);
 
         }
-        if ( $req->password && $req->password !== '?' ) {
+        if ( $req->password ) {
+
             $user->password = Hash::make($req->password);
+            
         }
         $data = [
             'name' => $req->name,
@@ -114,13 +118,15 @@ class AdminController extends Controller {
             'phone' => $req->phone,
             'country' => $req->country,
             'city' => $req->city,
-            'location' => $req->location,
-            'notes' => $req->notes ?? '',
+            'street' => $req->street,
+            'notes' => $req->notes,
             'allow_categories' => $this->bool($req->allow_categories),
             'allow_products' => $this->bool($req->allow_products),
             'allow_coupons' => $this->bool($req->allow_coupons),
             'allow_orders' => $this->bool($req->allow_orders),
             'allow_blogs' => $this->bool($req->allow_blogs),
+            'allow_comments' => $this->bool($req->allow_comments),
+            'allow_replies' => $this->bool($req->allow_replies),
             'allow_reports' => $this->bool($req->allow_reports),
             'allow_reviews' => $this->bool($req->allow_reviews),
             'allow_contacts' => $this->bool($req->allow_contacts),

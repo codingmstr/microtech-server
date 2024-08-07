@@ -10,9 +10,11 @@ return new class extends Migration {
 
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
+            $table->integer('admin_id')->default(0);
+            $table->integer('vendor_id')->default(0);
             $table->integer('user_id')->default(0);
-            $table->integer('order_id')->default(0);
             $table->integer('product_id')->default(0);
+            $table->integer('order_id')->default(0);
             $table->string('location')->nullable();
             $table->string('ip')->nullable();
             $table->string('agent')->nullable();

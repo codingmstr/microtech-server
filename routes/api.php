@@ -83,7 +83,6 @@ Route::prefix('admin')->group(function(){
                     Route::post('', 'App\Http\Controllers\Admin\CategoryController@show');
                     Route::post('update', 'App\Http\Controllers\Admin\CategoryController@update');
                     Route::post('delete', 'App\Http\Controllers\Admin\CategoryController@delete');
-                    Route::post('products', 'App\Http\Controllers\Admin\CategoryController@products');
                 });
 
             });
@@ -102,8 +101,6 @@ Route::prefix('admin')->group(function(){
                     Route::post('', 'App\Http\Controllers\Admin\ProductController@show');
                     Route::post('update', 'App\Http\Controllers\Admin\ProductController@update');
                     Route::post('delete', 'App\Http\Controllers\Admin\ProductController@delete');
-                    Route::post('orders', 'App\Http\Controllers\Admin\ProductController@orders');
-                    Route::post('reviews', 'App\Http\Controllers\Admin\ProductController@reviews');
                 });
 
             });
@@ -121,7 +118,6 @@ Route::prefix('admin')->group(function(){
                     Route::post('', 'App\Http\Controllers\Admin\CouponController@show');
                     Route::post('update', 'App\Http\Controllers\Admin\CouponController@update');
                     Route::post('delete', 'App\Http\Controllers\Admin\CouponController@delete');
-                    Route::post('orders', 'App\Http\Controllers\Admin\CouponController@orders');
                 });
 
             });
@@ -174,10 +170,13 @@ Route::prefix('admin')->group(function(){
                     Route::post('', 'App\Http\Controllers\Admin\BlogController@show');
                     Route::post('update', 'App\Http\Controllers\Admin\BlogController@update');
                     Route::post('delete', 'App\Http\Controllers\Admin\BlogController@delete');
-                    Route::post('comments', 'App\Http\Controllers\Admin\BlogController@comments');
                 });
 
             });
+
+        });
+        Route::middleware('comments')->group(function(){
+
             Route::prefix('comment')->group(function(){
 
                 Route::post('', 'App\Http\Controllers\Admin\CommentController@index');
@@ -188,10 +187,13 @@ Route::prefix('admin')->group(function(){
                     Route::post('', 'App\Http\Controllers\Admin\CommentController@show');
                     Route::post('update', 'App\Http\Controllers\Admin\CommentController@update');
                     Route::post('delete', 'App\Http\Controllers\Admin\CommentController@delete');
-                    Route::post('replies', 'App\Http\Controllers\Admin\CommentController@replies');
                 });
 
             });
+          
+        });
+        Route::middleware('replies')->group(function(){
+
             Route::prefix('reply')->group(function(){
 
                 Route::post('', 'App\Http\Controllers\Admin\ReplyController@index');
@@ -205,7 +207,7 @@ Route::prefix('admin')->group(function(){
                 });
 
             });
-
+          
         });
         Route::middleware('contacts')->group(function(){
 
@@ -235,10 +237,6 @@ Route::prefix('admin')->group(function(){
                     Route::post('', 'App\Http\Controllers\Admin\ClientController@show');
                     Route::post('update', 'App\Http\Controllers\Admin\ClientController@update');
                     Route::post('delete', 'App\Http\Controllers\Admin\ClientController@delete');
-                    Route::post('orders', 'App\Http\Controllers\Admin\ClientController@orders');
-                    Route::post('reviews', 'App\Http\Controllers\Admin\ClientController@reviews');
-                    Route::post('comments', 'App\Http\Controllers\Admin\ClientController@comments');
-                    Route::post('replies', 'App\Http\Controllers\Admin\ClientController@replies');
                 });
 
             });
@@ -292,9 +290,3 @@ Route::prefix('admin')->group(function(){
     });
 
 });
-
-// try this
-
-//  Route::middleware('mails')->prefix('mail')->controller('App\Http\Controllers\Admin\MailController')->group(function(){
-//      Route::post('', 'index');
-//  })

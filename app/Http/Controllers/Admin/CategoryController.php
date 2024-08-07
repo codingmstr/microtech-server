@@ -4,22 +4,32 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\CategoryResource;
-use App\Http\Resources\ProductResource;
 use App\Models\Category;
+use App\Models\Product;
+use App\Models\Coupon;
 use App\Models\File;
 
 class CategoryController extends Controller {
+    
+    public function statistics ( $id ) {
 
+        $products = $this->charts( Product::where('category_id', $id) );
+        $coupons = $this->charts( Coupon::where('category_id', $id) );
+        return ['products' => $products, 'coupons' => $coupons];
+
+    }
     public function index ( Request $req ) {
 
-        $categories = CategoryResource::collection( Category::all() );
-        return $this->success(['categories' => $categories]);
+        $data = $this->paginate( Category::query(), $req );
+        $items = CategoryResource::collection( $data['items'] );
+        return $this->success(['items' => $items, 'total'=> $data['total']]);
 
     }
     public function show ( Request $req, Category $category ) {
 
-        $category = CategoryResource::make( $category );
-        return $this->success(['category' => $category]);
+        $item = CategoryResource::make( $category );
+        $data = ['item' => $item, 'statistics' => self::statistics($category->id)];
+        return $this->success($data);
 
     }
     public function store ( Request $req ) {
@@ -30,17 +40,20 @@ class CategoryController extends Controller {
 
         }
         $data = [
+            'admin_id' => $this->user()->id,
+            'vendor_id' => $this->integer($req->vendor_id),
             'name' => $req->name,
             'slug' => $this->slug($req->name),
             'company' => $req->company,
             'phone' => $req->phone,
             'location' => $req->location,
             'description' => $req->description,
+            'notes' => $req->notes,
             'allow_products' => $this->bool($req->allow_products),
             'allow_coupons' => $this->bool($req->allow_coupons),
             'allow_orders' => $this->bool($req->allow_orders),
+            'allow_reviews' => $this->bool($req->allow_reviews),
             'active' => $this->bool($req->active),
-            // 'image' => $this->upload_file($req->file('image_file'), 'category'),
         ];
 
         $category = Category::create($data);
@@ -63,15 +76,18 @@ class CategoryController extends Controller {
 
         }
         $data = [
+            'vendor_id' => $this->integer($req->vendor_id),
             'name' => $req->name,
             'slug' => $this->slug($req->name),
             'company' => $req->company,
             'phone' => $req->phone,
             'location' => $req->location,
             'description' => $req->description,
+            'notes' => $req->notes,
             'allow_products' => $this->bool($req->allow_products),
             'allow_coupons' => $this->bool($req->allow_coupons),
             'allow_orders' => $this->bool($req->allow_orders),
+            'allow_reviews' => $this->bool($req->allow_reviews),
             'active' => $this->bool($req->active),
         ];
 
@@ -89,12 +105,6 @@ class CategoryController extends Controller {
 
         foreach ( $this->parse($req->ids) as $id ) Category::find($id)?->delete();
         return $this->success();
-
-    }
-    public function products ( Request $req, Category $category ) {
-
-        $products = ProductResource::for_category( $category->products );
-        return $this->success(['products' => $products]);
 
     }
 

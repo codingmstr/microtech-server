@@ -8,20 +8,32 @@ use Illuminate\Support\Facades\Hash;
 use App\Http\Resources\VendorResource;
 use App\Models\User;
 use App\Models\File;
+use App\Models\Product;
+use App\Models\Order;
+use App\Models\Coupon;
 
 class VendorController extends Controller {
 
+    public function statistics ( $id ) {
+
+        $products = $this->charts( Product::where('vendor_id', $id) );
+        $orders = $this->charts( Order::where('vendor_id', $id) );
+        $coupons = $this->charts( Coupon::where('vendor_id', $id) );
+        return ['products' => $products, 'orders' => $orders, 'coupons' => $coupons];
+
+    }
     public function index ( Request $req ) {
 
-        $user = VendorResource::collection( User::where('role', 2)->get() );
-        return $this->success(['vendors' => $user]);
+        $data = $this->paginate( User::where('role', 2), $req );
+        $items = VendorResource::collection( $data['items'] );
+        return $this->success(['items' => $items, 'total' => $data['total']]);
 
     }
     public function show ( Request $req, User $user ) {
 
         if ( $user->role != 2 ) return $this->failed(['vendor' => 'not exists']);
-        $user = VendorResource::make( $user );
-        return $this->success(['vendor' => $user]);
+        $item = VendorResource::make( $user );
+        return $this->success(['item' => $item, 'statistics' => $this->statistics($user->id)]);
 
     }
     public function store ( Request $req ) {
@@ -37,26 +49,32 @@ class VendorController extends Controller {
 
         }
         $data = [
+            'admin_id' => $this->user()->id,
             'role' => 2,
             'name' => $req->name,
             'email' => $req->email,
             'password' => Hash::make($req->password),
-            'language' => $req->language,
             'age' => $this->float($req->age),
             'phone' => $req->phone,
+            'language' => $req->language,
             'country' => $req->country,
             'city' => $req->city,
-            'location' => $req->location,
-            'notes' => $req->notes ?? '',
+            'street' => $req->street,
+            'notes' => $req->notes,
             'ip' => $req->ip(),
             'agent' => $req->userAgent(),
+            'allow_categories' => $this->bool($req->allow_categories),
             'allow_products' => $this->bool($req->allow_products),
             'allow_coupons' => $this->bool($req->allow_coupons),
             'allow_orders' => $this->bool($req->allow_orders),
-            'allow_reviews' => $this->bool($req->allow_reviews),
-            'allow_messages' => $this->bool($req->allow_messages),
-            'allow_statistics' => $this->bool($req->allow_statistics),
+            'allow_blogs' => $this->bool($req->allow_blogs),
+            'allow_comments' => $this->bool($req->allow_comments),
+            'allow_replies' => $this->bool($req->allow_replies),
             'allow_reports' => $this->bool($req->allow_reports),
+            'allow_reviews' => $this->bool($req->allow_reviews),
+            'allow_contacts' => $this->bool($req->allow_contacts),
+            'allow_statistics' => $this->bool($req->allow_statistics),
+            'allow_messages' => $this->bool($req->allow_messages),
             'allow_login' => $this->bool($req->allow_login),
             'active' => $this->bool($req->active),
         ];
@@ -73,7 +91,6 @@ class VendorController extends Controller {
         $validator = Validator::make($req->all(), [
             'name' => ['required', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email,' . $user->id],
-            'password' => ['required', 'max:255'],
         ]);
         if ( $validator->fails() ) {
 
@@ -87,28 +104,35 @@ class VendorController extends Controller {
             $this->upload_files([$req->file('image_file')], 'user', $user->id);
 
         }
-        if ( $req->password && $req->password !== '?' ) {
+        if ( $req->password ) {
 
             $user->password = Hash::make($req->password);
-
+            
         }
         $data = [
             'name' => $req->name,
             'email' => $req->email,
-            'language' => $req->language,
             'age' => $this->float($req->age),
             'phone' => $req->phone,
+            'language' => $req->language,
             'country' => $req->country,
             'city' => $req->city,
-            'location' => $req->location,
-            'notes' => $req->notes ?? '',
+            'street' => $req->street,
+            'notes' => $req->notes,
+            'ip' => $req->ip(),
+            'agent' => $req->userAgent(),
+            'allow_categories' => $this->bool($req->allow_categories),
             'allow_products' => $this->bool($req->allow_products),
             'allow_coupons' => $this->bool($req->allow_coupons),
             'allow_orders' => $this->bool($req->allow_orders),
-            'allow_reviews' => $this->bool($req->allow_reviews),
-            'allow_messages' => $this->bool($req->allow_messages),
-            'allow_statistics' => $this->bool($req->allow_statistics),
+            'allow_blogs' => $this->bool($req->allow_blogs),
+            'allow_comments' => $this->bool($req->allow_comments),
+            'allow_replies' => $this->bool($req->allow_replies),
             'allow_reports' => $this->bool($req->allow_reports),
+            'allow_reviews' => $this->bool($req->allow_reviews),
+            'allow_contacts' => $this->bool($req->allow_contacts),
+            'allow_statistics' => $this->bool($req->allow_statistics),
+            'allow_messages' => $this->bool($req->allow_messages),
             'allow_login' => $this->bool($req->allow_login),
             'active' => $this->bool($req->active),
         ];

@@ -17,7 +17,6 @@ class VendorResource extends JsonResource {
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
-            'password' => '?',
             'age' => $this->age,
             'language' => $this->language,
             'country' => $this->country,
@@ -27,6 +26,7 @@ class VendorResource extends JsonResource {
             'balance' => $this->balance,
             'notes' => $this->notes,
             'allow_messages' => $this->allow_messages,
+            'allow_categories' => $this->allow_categories,
             'allow_products' => $this->allow_products,
             'allow_coupons' => $this->allow_coupons,
             'allow_orders' => $this->allow_orders,
@@ -40,6 +40,8 @@ class VendorResource extends JsonResource {
             'login_at' => $this->login_at?->format('Y-m-d H:i:s'),
             'image' => $image,
             'info' => ['name' => $this->name, 'image' => $image],
+            'products' => count($this->vendor_products),
+            'orders' => count($this->vendor_orders),
         ];
 
     }

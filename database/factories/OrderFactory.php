@@ -9,8 +9,8 @@ class OrderFactory extends Factory {
     public function definition () {
 
         return [
-            'user_id' => 5,
             'product_id' => 1,
+            'client_id' => 5,
             'name' => fake()->name(),
             'phone' => fake()->phoneNumber(),
             'email' => fake()->email(),

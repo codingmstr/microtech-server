@@ -10,9 +10,11 @@ return new class extends Migration {
 
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->default(0);
+            $table->integer('admin_id')->default(0);
+            $table->integer('vendor_id')->default(0);
             $table->integer('product_id')->default(0);
             $table->integer('coupon_id')->default(0);
+            $table->integer('client_id')->default(0);
             $table->string('name')->nullable();
             $table->string('email')->nullable();
             $table->string('phone')->nullable();

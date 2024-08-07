@@ -10,6 +10,8 @@ class Category extends Model {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'admin_id',
+        'vendor_id',
         'name',
         'slug',
         'company',
@@ -21,12 +23,28 @@ class Category extends Model {
         'allow_products',
         'allow_orders',
         'allow_coupons',
+        'allow_reviews',
         'active',
     ];
 
+    public function admin () {
+
+        return $this->belongsTo(User::class, 'admin_id');
+
+    }
+    public function vendor () {
+
+        return $this->belongsTo(User::class, 'vendor_id');
+
+    }
     public function products () {
 
         return $this->hasMany(Product::class);
+
+    }
+    public function coupons () {
+
+        return $this->hasMany(Coupon::class);
 
     }
 

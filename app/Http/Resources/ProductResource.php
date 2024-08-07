@@ -7,26 +7,30 @@ use App\Models\File;
 
 class ProductResource extends JsonResource {
 
-    protected static $with_category = true;
-
     public function toArray ( Request $req ) {
 
         $files = File::where('table', 'product')->where('column', $this->id);
         $images = FileResource::collection( $files->get() );
         $image = $files->where('type', 'image')->latest()->first()?->url;
 
-        $data = [
+        return [
             'id' => $this->id,
             'name' => $this->name,
             'company' => $this->company,
             'phone' => $this->phone,
+            'language' => $this->language,
             'country' => $this->country,
             'city' => $this->city,
+            'street' => $this->street,
             'location' => $this->location,
             'old_price' => $this->old_price,
             'new_price' => $this->new_price,
             'description' => $this->description,
             'details' => $this->details,
+            'availability' => $this->availability,
+            'policy' => $this->policy,
+            'rules' => $this->rules,
+            'safety' => $this->safety,
             'includes' => $this->includes,
             'notes' => $this->notes,
             'views' => $this->views,
@@ -35,22 +39,18 @@ class ProductResource extends JsonResource {
             'allow_orders' => $this->allow_orders,
             'allow_reviews' => $this->allow_reviews,
             'active' => $this->active,
-            'reviews' => count($this->reviews),
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
             'info' => ['name' => $this->name, 'image' => $image],
             'image' => $image,
             'images' => $images,
+            'category_id' => $this->category_id,
+            'vendor_id' => $this->vendor_id,
+            'reviews' => count($this->reviews),
+            'orders' => count($this->orders),
+            'category' => CategoryResource::make( $this->category ),
+            'vendor' => UserResource::make( $this->vendor ),
         ];
-
-        if ( self::$with_category ) $data['category'] = CategoryResource::make( $this->category );
-        return $data;
-
-    }
-    public static function for_category ( $resouce ) {
-
-        self::$with_category = false;
-        return parent::collection( $resouce );
 
     }
 

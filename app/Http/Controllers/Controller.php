@@ -1,8 +1,12 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use App\Models\File;
+use App\Models\Order;
+use DateTime;
+use Carbon\Carbon;
 
 abstract class Controller {
 
@@ -103,6 +107,17 @@ abstract class Controller {
         return $value;
 
     }
+    public function key_value ( $string ) {
+
+        $key = ''; $value = '';
+        $query = preg_replace("/=+/", "=", $string);
+        $query = explode("=", $query);
+        if ( count($query) > 1 ) { $key = $query[0]; $value = $query[1]; }
+
+        if ( $key ) return ['key' => $key,'value'=> $value ];
+        else return ['key' => '','value'=> ''];
+
+    }
     public function random_key () {
 
         $key = '';
@@ -131,6 +146,98 @@ abstract class Controller {
     public function date () {
 
         return date('Y-m-d H:i:s');
+
+    }
+    public function paginate ( $table, $request ) {
+        
+        $page = $request->page;
+        $limit = $request->limit;
+        $search = $request->search;
+        $filters = $request->filters;
+        $filter = $request->filter;
+        $count = $table->count();
+        $items = $table->orderBy("id", $filter === 'oldest' ? 'asc' : 'desc');
+
+        if ( $search ) {
+
+            $columns = Schema::getColumnListing( $table->first()->getTable() );
+            $search = trim($search);
+
+            $items = $items->where('id', $search)
+                ->orWhere('id', str_replace('=', '', $search))
+                ->orWhere('id', str_replace('-', '', $search))
+                ->orWhere(function ($subQuery) use ($search, $columns) {
+                    foreach ($columns as $column) {
+                        $subQuery->orWhere($column, 'like', "%{$search}%");
+                    }
+                });
+
+            $count = $items->count();
+
+        }
+        if ( $filters ) {
+            
+            $filters = $this->parse($request->filters);
+            $filters = count($filters) ? $filters[0] : $filters;
+
+            foreach ( $filters as $key => $value ) {
+                $items = $items->where($key, $value);
+                $count = $items->count();
+            }
+
+        }
+        if ( $limit ) {
+
+            $items = $items->forPage($page ?? 1, $limit);
+
+        }
+
+        return ['items' => $items->get(), 'total' => $count];
+
+    }
+    public function series ( $items, $rng, $duration ) {
+
+        $list = array_fill(0, $rng, 0);
+
+        foreach( $items as $item ) {
+
+            $date1 = new DateTime( $item->created_at );
+            $date2 = new DateTime();
+            $diff = $date2->getTimestamp() - $date1->getTimestamp();
+
+            for( $ch=1; $ch <= $rng; $ch++ ) {
+
+                if ( $duration * $ch >= $diff && $diff > $duration * ($ch-1) ) {
+
+                    $list[$ch-1]++;
+                    break;
+
+                }
+
+            }
+
+        }
+
+        return array_reverse($list);
+
+    }
+    public function charts ( $table ) {
+
+        $total = count($table->get());
+        $year_items = $table->whereBetween('created_at', [now()->subYears(7), now()])->get();
+        $month_items = $table->whereBetween('created_at', [now()->subYears(1), now()])->get();
+        $week_items = $table->whereBetween('created_at', [now()->subWeeks(7), now()])->get();
+        $day_items = $table->whereBetween('created_at', [now()->subDays(7), now()])->get();
+
+        $data = [
+            'total' => $total,
+            'daily' => ['total' => count($day_items), 'series' => $this->series($day_items, 7, 86400)],
+            'weekly' => ['total' => count($week_items), 'series' => $this->series($week_items, 7, 604800)],
+            'monthly' => ['total' => count($month_items), 'series' => $this->series($month_items, 12, 2592000)],
+            'yearly' => ['total' => count($year_items), 'series' => $this->series($year_items, 7, 31536000)],
+        ];
+
+        return $data;
 
     }
 
