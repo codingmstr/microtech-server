@@ -1,12 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use App\Models\File;
-use App\Models\Order;
 use DateTime;
-use Carbon\Carbon;
 
 abstract class Controller {
 
@@ -140,7 +139,7 @@ abstract class Controller {
     }
     public function user () {
 
-        return auth()->guard('sanctum')->user();
+        return Auth::guard('sanctum')->user();
 
     }
     public function date () {

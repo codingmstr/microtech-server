@@ -30,6 +30,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'orders' => \App\Http\Middleware\Orders::class,
             'reviews' => \App\Http\Middleware\Reviews::class,
             'blogs' => \App\Http\Middleware\Blogs::class,
+            'comments' => \App\Http\Middleware\Comments::class,
+            'replies' => \App\Http\Middleware\Replies::class,
             'reports' => \App\Http\Middleware\Reports::class,
             'contacts' => \App\Http\Middleware\Contacts::class,
             'statistics' => \App\Http\Middleware\Statistics::class,

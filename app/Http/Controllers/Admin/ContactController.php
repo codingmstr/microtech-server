@@ -10,11 +10,24 @@ class ContactController extends Controller {
 
     public function index ( Request $req ) {
 
-        $contacts = ContactResource::collection( Contact::all() );
-        return $this->success(['contacts' => $contacts]);
+        $data = $this->paginate( Contact::query(), $req );
+        $items = ContactResource::collection( $data['items'] );
+        return $this->success(['items' => $items, 'total'=> $data['total']]);
 
     }
-    public function delete ( Request $req ) {
+    public function show ( Request $req, Contact $contact ) {
+
+        $item = ContactResource::make( $contact );
+        return $this->success(['item' => $item]);
+
+    }
+    public function delete ( Request $req, Contact $contact ) {
+
+        $contact->delete();
+        return $this->success();
+
+    }
+    public function delete_group ( Request $req ) {
 
         foreach ( $this->parse($req->ids) as $id ) Contact::find($id)?->delete();
         return $this->success();

@@ -5,22 +5,40 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\ReviewResource;
 use App\Http\Resources\ProductResource;
+use App\Http\Resources\UserResource;
 use App\Models\Review;
 use App\Models\Product;
+use App\Models\User;
 
 class ReviewController extends Controller {
 
+    public function systems () {
+
+        $products = Product::where('active', true)->where('allow_reviews', true)->get();
+        $products = ProductResource::collection( $products );
+
+        $clients = User::where('role', '3')->where('active', true)->where('allow_reviews', true)->get();
+        $clients = UserResource::collection( $clients );
+
+        return ['products' => $products, 'clients' => $clients];
+
+    }
+    public function default ( Request $req ) {
+        
+        return $this->success(self::systems());
+
+    }
     public function index ( Request $req ) {
 
-        $reviews = ReviewResource::collection( Review::all() );
-        $products = ProductResource::collection( Product::where('active', true)->where('allow_reviews', true)->get() );
-        return $this->success(['reviews' => $reviews, 'products' => $products]);
-
+        $data = $this->paginate( Review::query(), $req );
+        $items = ReviewResource::collection( $data['items'] );
+        return $this->success(['items' => $items, 'total'=> $data['total']]);
+        
     }
     public function show ( Request $req, Review $review ) {
 
-        $review = ReviewResource::make( $review );
-        return $this->success(['review' => $review]);
+        $item = ReviewResource::make( $review );
+        return $this->success(['item' => $item] + self::systems());
 
     }
     public function store ( Request $req ) {
@@ -29,7 +47,9 @@ class ReviewController extends Controller {
         if ( !$product ) return $this->failed(['product' => 'not exists']);
 
         $data = [
-            'user_id' => 1,
+            'admin_id' => $this->user()->id,
+            'vendor_id' => $this->integer($req->vendor_id),
+            'client_id' => $this->integer($req->client_id),
             'product_id' => $this->integer($req->product_id),
             'content' => $req->content,
             'rate' => $this->float($req->rate),
@@ -43,8 +63,8 @@ class ReviewController extends Controller {
     public function update ( Request $req, Review $review ) {
 
         $data = [
-            // 'content' => $req->content,
-            // 'rate' => $this->float($req->rate),
+            'content' => $req->content,
+            'rate' => $this->float($req->rate),
             'active' => $this->bool($req->active),
         ];
 

@@ -14,38 +14,45 @@ use App\Models\Coupon;
 
 class OrderController extends Controller {
 
-    public function index ( Request $req ) {
+    public function systems () {
 
-        $orders = OrderResource::collection( Order::all() );
-        return $this->success(['orders' => $orders]);
+        $clients = User::where('role', 3)->where('active', true)->where('allow_orders', true)->get();
+        $clients = UserResource::collection( $clients );
+
+        $products = Product::where('active', true)->where('allow_orders', true)->get();
+        $products = ProductResource::collection( $products );
+
+        $coupons = Coupon::where('active', true)->where('allow_orders', true)->get();
+        $coupons = CouponResource::collection( $coupons );
+
+        return ['products' => $products, 'clients' => $clients, 'coupons' => $coupons];
 
     }
     public function default ( Request $req ) {
 
-        $users = User::where('role', 3)->where('active', true)->where('allow_orders', true)->get();
-        $products = Product::where('active', true)->where('allow_orders', true)->get();
-        $coupons = Coupon::where('active', true)->get();
+        return $this->success(self::systems());
 
-        $users = UserResource::collection( $users );
-        $products = ProductResource::collection( $products );
-        $coupons = CouponResource::collection( $coupons );
+    }
+    public function index ( Request $req ) {
 
-        return $this->success(['users' => $users, 'products' => $products, 'coupons' => $coupons]);
+        $data = $this->paginate( Order::query(), $req );
+        $items = OrderResource::collection( $data['items'] );
+        return $this->success(['items' => $items, 'total'=> $data['total']]);
 
     }
     public function show ( Request $req, Order $order ) {
 
-        $order = OrderResource::make( $order );
-        return $this->success(['order' => $order]);
+        $item = OrderResource::make( $order );
+        return $this->success(['item' => $item] + self::systems());
 
     }
     public function store ( Request $req ) {
 
         $product = Product::where('id', $req->product_id)->where('allow_orders', true)->where('active', true)->first();
-        $user = User::where('role', 3)->where('id', $req->user_id)->where('active', true)->where('allow_orders', true)->first();
+        $client = User::where('role', 3)->where('id', $req->client_id)->where('active', true)->where('allow_orders', true)->first();
         $coupon = Coupon::where('id', $req->coupon_id)->where('active', true)->first();
 
-        if ( !$user ) return $this->failed(['user' => 'not exists']);
+        if ( !$client ) return $this->failed(['client' => 'not exists']);
         if ( !$product ) return $this->failed(['product' => 'not exists']);
 
         $price = $product->new_price;
@@ -75,15 +82,21 @@ class OrderController extends Controller {
         }
 
         $data = [
-            'user_id' => $this->integer($req->user_id),
+            'admin_id' => $this->user()->id,
+            'vendor_id' => $this->integer($req->vendor_id),
+            'client_id' => $this->integer($req->client_id),
             'product_id' => $this->integer($req->product_id),
             'coupon_id' => $this->integer($req->coupon_id),
             'name' => $req->name,
             'email' => $req->email,
-            'phone' => $req->phone,
             'address' => $req->address,
+            'company' => $req->company,
+            'phone' => $req->phone,
+            'language' => $req->language,
             'country' => $req->country,
             'city' => $req->city,
+            'street' => $req->street,
+            'location' => $req->location,
             'notes' => $req->notes,
             'secret_key' => $secret_key,
             'price' => $price,
@@ -117,10 +130,13 @@ class OrderController extends Controller {
         $data = [
             'name' => $req->name,
             'email' => $req->email,
-            'phone' => $req->phone,
             'address' => $req->address,
+            'company' => $req->company,
+            'phone' => $req->phone,
+            'language' => $req->language,
             'country' => $req->country,
             'city' => $req->city,
+            'street' => $req->street,
             'location' => $req->location,
             'notes' => $req->notes,
             'paid' => $this->bool($req->paid),

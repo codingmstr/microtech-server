@@ -17,6 +17,7 @@ class User extends Authenticatable {
         'name',
         'email',
         'phone',
+        'company',
         'image',
         'password',
         'language',
@@ -77,19 +78,20 @@ class User extends Authenticatable {
     }
     public function reviews () {
 
-        return $this->hasMany(Review::class);
+        return $this->hasMany(Review::class, 'client_id');
 
     }
     public function comments () {
 
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(Comment::class, 'client_id');
 
     }
     public function replies () {
 
-        return $this->hasMany(Reply::class);
+        return $this->hasMany(Reply::class, 'client_id');
 
     }
+
     public function vendor_products () {
 
         return $this->hasMany(Product::class, 'vendor_id');
@@ -98,6 +100,11 @@ class User extends Authenticatable {
     public function vendor_orders () {
 
         return $this->hasMany(Order::class, 'vendor_id');
+
+    }
+    public function vendor_reviews () {
+
+        return $this->hasMany(Review::class, 'vendor_id');
 
     }
 

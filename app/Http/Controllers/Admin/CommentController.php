@@ -5,23 +5,40 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\BlogResource;
 use App\Http\Resources\CommentResource;
-use App\Http\Resources\ReplyResource;
+use App\Http\Resources\UserResource;
 use App\Models\Comment;
 use App\Models\Blog;
+use App\Models\User;
 
 class CommentController extends Controller {
 
+    public function systems () {
+
+        $blogs = Blog::where('active', true)->where('allow_comments', true)->get();
+        $blogs = BlogResource::collection( $blogs );
+
+        $clients = User::where('role', '3')->where('active', true)->where('allow_comments', true)->get();
+        $clients = UserResource::collection( $clients );
+
+        return ['blogs' => $blogs, 'clients' => $clients];
+
+    }
+    public function default ( Request $req ) {
+        
+        return $this->success(self::systems());
+
+    }
     public function index ( Request $req ) {
 
-        $comments = CommentResource::collection( Comment::all() );
-        $blogs = BlogResource::collection( Blog::where('active', true)->where('allow_comments', true)->get() );
-        return $this->success(['comments' => $comments, 'blogs' => $blogs]);
+        $data = $this->paginate( Comment::query(), $req );
+        $items = CommentResource::collection( $data['items'] );
+        return $this->success(['items' => $items, 'total'=> $data['total']]);
 
     }
     public function show ( Request $req, Comment $comment ) {
 
-        $comment = CommentResource::make( $comment );
-        return $this->success(['comment' => $comment]);
+        $item = CommentResource::make( $comment );
+        return $this->success(['item' => $item] + self::systems());
 
     }
     public function store ( Request $req ) {
@@ -30,7 +47,9 @@ class CommentController extends Controller {
         if ( !$blog ) return $this->failed(['blog' => 'not exists']);
 
         $data = [
-            'user_id' => 1,
+            'admin_id' => $this->user()->id,
+            'vendor_id' => $this->integer($req->vendor_id),
+            'client_id' => $this->integer($req->client_id),
             'blog_id' => $this->integer($req->blog_id),
             'content' => $req->content,
             'allow_replies' => $this->bool($req->allow_replies),
@@ -44,7 +63,7 @@ class CommentController extends Controller {
     public function update ( Request $req, Comment $comment ) {
 
         $data = [
-            // 'content' => $req->content,
+            'content' => $req->content,
             'allow_replies' => $this->bool($req->allow_replies),
             'active' => $this->bool($req->active),
         ];
@@ -63,12 +82,6 @@ class CommentController extends Controller {
 
         foreach ( $this->parse($req->ids) as $id ) Comment::find($id)?->delete();
         return $this->success();
-
-    }
-    public function replies ( Request $req, Comment $comment ) {
-
-        $replies = ReplyResource::for_comment( $comment->replies );
-        return $this->success(['replies' => $replies]);
 
     }
 

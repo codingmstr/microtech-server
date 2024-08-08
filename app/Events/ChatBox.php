@@ -13,14 +13,16 @@ class ChatBox implements ShouldBroadcast {
 
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public $sender;
     public $receiver;
     public $action;
     public $user;
     public $message;
     public $to_all;
 
-    public function __construct ( $receiver=0, $action='', $user='', $message='', $to_all=false ) {
+    public function __construct ( $sender=0, $receiver=0, $action='', $user='', $message='', $to_all=false ) {
 
+        $this->sender = $sender;
         $this->receiver = $receiver;
         $this->action = $action;
         $this->user = $user;
@@ -38,6 +40,7 @@ class ChatBox implements ShouldBroadcast {
     public function broadcastWith () {
 
         return [
+            'sender' => $this->sender,
             'receiver' => $this->receiver,
             'action' => $this->action,
             'user' => $this->user,

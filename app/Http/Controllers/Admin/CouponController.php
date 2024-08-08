@@ -4,21 +4,49 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\CouponResource;
-use App\Http\Resources\OrderResource;
+use App\Http\Resources\CategoryResource;
+use App\Http\Resources\ProductResource;
+use App\Http\Resources\UserResource;
 use App\Models\Coupon;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\User;
 
 class CouponController extends Controller {
 
+    public function systems () {
+
+        $categories = Category::where('active', true)->where('allow_coupons', true)->get();
+        $categories = CategoryResource::collection( $categories );
+
+        $products = Product::where('active', true)->where('allow_coupons', true)->get();
+        $products = ProductResource::collection( $products );
+
+        $vendors = User::where('role', '2')->where('active', true)->where('allow_coupons', true)->get();
+        $vendors = UserResource::collection( $vendors );
+
+        $clients = User::where('role', '3')->where('active', true)->where('allow_coupons', true)->get();
+        $clients = UserResource::collection( $clients );
+
+        return ['categories' => $categories, 'products' => $products, 'vendors' => $vendors, 'clients' => $clients];
+
+    }
+    public function default ( Request $req ) {
+        
+        return $this->success(self::systems());
+
+    }
     public function index ( Request $req ) {
 
-        $coupons = CouponResource::collection( Coupon::all() );
-        return $this->success(['coupons' => $coupons]);
+        $data = $this->paginate( Coupon::query(), $req );
+        $items = CouponResource::collection( $data['items'] );
+        return $this->success(['items' => $items, 'total'=> $data['total']]);
 
     }
     public function show ( Request $req, Coupon $coupon ) {
 
-        $coupon = CouponResource::make( $coupon );
-        return $this->success(['coupon' => $coupon]);
+        $item = CouponResource::make( $coupon );
+        return $this->success(['item' => $item] + self::systems());
 
     }
     public function store ( Request $req ) {
@@ -29,12 +57,15 @@ class CouponController extends Controller {
 
         }
         $data = [
+            'admin_id' => $this->user()->id,
             'category_id' => $this->integer($req->category_id),
             'product_id' => $this->integer($req->product_id),
-            'user_id' => $this->integer($req->user_id),
+            'vendor_id' => $this->integer($req->vendor_id),
+            'client_id' => $this->integer($req->client_id),
             'name' => $req->name,
             'discount' => $this->float($req->discount),
             'notes' => $req->notes,
+            'allow_orders' => $this->bool($req->allow_orders),
             'active' => $this->bool($req->active),
         ];
 
@@ -52,10 +83,12 @@ class CouponController extends Controller {
         $data = [
             'category_id' => $this->integer($req->category_id),
             'product_id' => $this->integer($req->product_id),
-            'user_id' => $this->integer($req->user_id),
+            'vendor_id' => $this->integer($req->vendor_id),
+            'client_id' => $this->integer($req->client_id),
             'name' => $req->name,
             'discount' => $this->float($req->discount),
             'notes' => $req->notes,
+            'allow_orders' => $this->bool($req->allow_orders),
             'active' => $this->bool($req->active),
         ];
 
@@ -73,12 +106,6 @@ class CouponController extends Controller {
 
         foreach ( $this->parse($req->ids) as $id ) Coupon::find($id)?->delete();
         return $this->success();
-
-    }
-    public function orders ( Request $req, Coupon $coupon ) {
-
-        $orders = OrderResource::for_coupon( $coupon->orders );
-        return $this->success(['orders' => $orders]);
 
     }
 

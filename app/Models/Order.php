@@ -10,15 +10,21 @@ class Order extends Model {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'user_id',
+        'admin_id',
+        'vendor_id',
+        'client_id',
         'product_id',
         'coupon_id',
         'name',
         'email',
-        'phone',
         'address',
+        'company',
+        'phone',
+        'language',
         'country',
         'city',
+        'street',
+        'location',
         'notes',
         'secret_key',
         'price',
@@ -39,9 +45,19 @@ class Order extends Model {
         'ordered_at' => 'datetime',
     ];
 
-    public function user () {
+    public function admin () {
 
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'admin_id');
+
+    }
+    public function vendor () {
+
+        return $this->belongsTo(User::class, 'vendor_id');
+
+    }
+    public function client () {
+
+        return $this->belongsTo(User::class, 'client_id');
 
     }
     public function product () {
@@ -52,11 +68,6 @@ class Order extends Model {
     public function coupon () {
 
         return $this->belongsTo(Coupon::class);
-
-    }
-    public function review () {
-
-        return $this->hasMany(Review::class);
 
     }
 

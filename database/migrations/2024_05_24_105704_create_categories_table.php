@@ -16,6 +16,10 @@ return new class extends Migration {
             $table->string('slug')->unique();
             $table->string('company')->nullable();
             $table->string('phone')->nullable();
+            $table->string('language')->nullable();
+            $table->string('country')->nullable();
+            $table->string('city')->nullable();
+            $table->string('street')->nullable();
             $table->string('location')->nullable();
             $table->longText('description')->nullable();
             $table->string('notes')->nullable();

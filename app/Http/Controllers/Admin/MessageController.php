@@ -23,7 +23,7 @@ class MessageController extends Controller {
             ->where('readen', false)
             ->update(['readen' => true, 'readen_at' => $this->date()]);
         
-        event(new ChatBox($user->id, 'active', UserResource::make($user), '', true));
+        event(new ChatBox($this->user()->id, $user->id, 'active', UserResource::make($user), '', true));
 
     }
     public function _new_ ( $user_id ) {
@@ -81,7 +81,7 @@ class MessageController extends Controller {
         $this->upload_files( [$req->file('file')], 'message', $message->id );
 
         $message = MessageResource::make( Message::find($message->id) );
-        event(new ChatBox($user->id, 'message', UserResource::make($user), $message, true));
+        event(new ChatBox($this->user()->id, $user->id, 'message', UserResource::make($user), $message, true));
         return $this->success(['message' => $message]);
 
     }
@@ -98,7 +98,7 @@ class MessageController extends Controller {
         Message::where('sender_id', $this->current_id)->where('receiver_id', $user->id)->where('removed_sender', false)->update(['removed_sender' => true]);
         Message::where('receiver_id', $this->current_id)->where('sender_id', $user->id)->where('removed_receiver', false)->update(['removed_receiver' => true]);
         
-        event(new ChatBox($user->id, 'delete', UserResource::make($user), '', true));
+        event(new ChatBox($this->user()->id, $user->id, 'delete', UserResource::make($user), '', true));
         return $this->success();
 
     }
@@ -108,7 +108,7 @@ class MessageController extends Controller {
         if ( $message->receiver_id == $this->current_id ) { $message->removed_receiver = true; $user = $message->sender; }
         $message->save();
 
-        event(new ChatBox($user->id, 'delete_message', '', $message, true));
+        event(new ChatBox($this->user()->id, $user->id, 'delete_message', '', $message, true));
         return $this->success();
 
     }
@@ -117,7 +117,7 @@ class MessageController extends Controller {
         Relation::where('sender_id', $this->current_id)->where('receiver_id', $user->id)->where('archived_sender', false)->update(['archived_sender' => true]);
         Relation::where('receiver_id', $this->current_id)->where('sender_id', $user->id)->where('archived_receiver', false)->update(['archived_receiver' => true]);
         
-        event(new ChatBox($this->current_id, 'archive', UserResource::make($user)));
+        event(new ChatBox($this->user()->id, $this->current_id, 'archive', UserResource::make($user)));
         return $this->success();
 
     }
@@ -126,7 +126,7 @@ class MessageController extends Controller {
         Relation::where('sender_id', $this->current_id)->where('receiver_id', $user->id)->where('archived_sender', true)->update(['archived_sender' => false]);
         Relation::where('receiver_id', $this->current_id)->where('sender_id', $user->id)->where('archived_receiver', true)->update(['archived_receiver' => false]);
         
-        event(new ChatBox($this->current_id, 'unarchive', UserResource::make($user)));
+        event(new ChatBox($this->user()->id, $this->current_id, 'unarchive', UserResource::make($user)));
         return $this->success();
 
     }
@@ -136,7 +136,7 @@ class MessageController extends Controller {
         if ( $message->receiver_id == $this->current_id ) $message->star_receiver = true;
         $message->save();
 
-        event(new ChatBox($this->current_id, 'star', '', $message));
+        event(new ChatBox($this->user()->id, $this->current_id, 'star', '', $message));
         return $this->success();
 
     }
@@ -146,7 +146,7 @@ class MessageController extends Controller {
         if ( $message->receiver_id == $this->current_id ) $message->star_receiver = false;
         $message->save();
 
-        event(new ChatBox($this->current_id, 'unstar', '', $message));
+        event(new ChatBox($this->user()->id, $this->current_id, 'unstar', '', $message));
         return $this->success();
 
     }

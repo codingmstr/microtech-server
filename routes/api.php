@@ -111,6 +111,7 @@ Route::prefix('admin')->group(function(){
             Route::prefix('coupon')->group(function(){
 
                 Route::post('', 'App\Http\Controllers\Admin\CouponController@index');
+                Route::post('default', 'App\Http\Controllers\Admin\CouponController@default');
                 Route::post('store', 'App\Http\Controllers\Admin\CouponController@store');
                 Route::post('delete', 'App\Http\Controllers\Admin\CouponController@delete_group');
 
@@ -146,6 +147,7 @@ Route::prefix('admin')->group(function(){
             Route::prefix('review')->group(function(){
 
                 Route::post('', 'App\Http\Controllers\Admin\ReviewController@index');
+                Route::post('default', 'App\Http\Controllers\Admin\ReviewController@default');
                 Route::post('store', 'App\Http\Controllers\Admin\ReviewController@store');
                 Route::post('delete', 'App\Http\Controllers\Admin\ReviewController@delete_group');
 
@@ -163,6 +165,7 @@ Route::prefix('admin')->group(function(){
             Route::prefix('blog')->group(function(){
 
                 Route::post('', 'App\Http\Controllers\Admin\BlogController@index');
+                Route::post('default', 'App\Http\Controllers\Admin\BlogController@default');
                 Route::post('store', 'App\Http\Controllers\Admin\BlogController@store');
                 Route::post('delete', 'App\Http\Controllers\Admin\BlogController@delete_group');
 
@@ -180,6 +183,7 @@ Route::prefix('admin')->group(function(){
             Route::prefix('comment')->group(function(){
 
                 Route::post('', 'App\Http\Controllers\Admin\CommentController@index');
+                Route::post('default', 'App\Http\Controllers\Admin\CommentController@default');
                 Route::post('store', 'App\Http\Controllers\Admin\CommentController@store');
                 Route::post('delete', 'App\Http\Controllers\Admin\CommentController@delete_group');
 
@@ -197,6 +201,7 @@ Route::prefix('admin')->group(function(){
             Route::prefix('reply')->group(function(){
 
                 Route::post('', 'App\Http\Controllers\Admin\ReplyController@index');
+                Route::post('default', 'App\Http\Controllers\Admin\ReplyController@default');
                 Route::post('store', 'App\Http\Controllers\Admin\ReplyController@store');
                 Route::post('delete', 'App\Http\Controllers\Admin\ReplyController@delete_group');
 
@@ -213,7 +218,12 @@ Route::prefix('admin')->group(function(){
 
             Route::prefix('contact')->group(function(){
                 Route::post('', 'App\Http\Controllers\Admin\ContactController@index');
-                Route::post('delete', 'App\Http\Controllers\Admin\ContactController@delete');
+                Route::post('delete', 'App\Http\Controllers\Admin\ContactController@delete_group');
+
+                Route::prefix('{contact}')->group(function(){
+                    Route::post('', 'App\Http\Controllers\Admin\ContactController@show');
+                    Route::post('delete', 'App\Http\Controllers\Admin\ContactController@delete');
+                });
             });
 
         });

@@ -40,11 +40,13 @@ class AccountController extends Controller {
         $data = [
             'name' => $req->name,
             'email' => $req->email,
-            'phone' => $req->phone,
             'age' => $this->float($req->age),
+            'company' => $req->company,
+            'phone' => $req->phone,
             'language' => $req->language,
             'country' => $req->country,
             'city' => $req->city,
+            'street' => $req->street,
             'location' => $req->location,
         ];
 

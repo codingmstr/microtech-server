@@ -4,38 +4,47 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\BlogResource;
-use App\Http\Resources\CommentResource;
-use App\Http\Resources\ReplyResource;
 use App\Models\Blog;
 
 class BlogController extends Controller {
 
     public function index ( Request $req ) {
 
-        $blogs = BlogResource::collection( Blog::all() );
-        return $this->success(['blogs' => $blogs]);
+        $data = $this->paginate( Blog::query(), $req );
+        $items = BlogResource::collection( $data['items'] );
+        return $this->success(['items' => $items, 'total'=> $data['total']]);
 
     }
     public function show ( Request $req, Blog $blog ) {
 
-        $blog = BlogResource::make( $blog );
-        return $this->success(['blog' => $blog]);
+        $item = BlogResource::make( $blog );
+        return $this->success(['item' => $item]);
 
     }
     public function store ( Request $req ) {
 
+        if ( Blog::where('slug', $this->slug($req->title))->exists() ) {
+
+            return $this->failed(['title' => 'exists']);
+
+        }
         $data = [
+            'admin_id' => $this->user()->id,
+            'vendor_id' => $this->integer($req->vendor_id),
             'title' => $req->title,
             'slug' => $this->slug($req->title),
             'description' => $req->description,
             'content' => $req->content,
-            'phone' => $req->phone,
             'company' => $req->company,
+            'phone' => $req->phone,
+            'language' => $req->language,
             'country' => $req->country,
             'city' => $req->city,
+            'street' => $req->street,
             'location' => $req->location,
             'notes' => $req->notes,
             'allow_comments' => $this->bool($req->allow_comments),
+            'allow_replies' => $this->bool($req->allow_replies),
             'allow_likes' => $this->bool($req->allow_likes),
             'allow_dislikes' => $this->bool($req->allow_dislikes),
             'active' => $this->bool($req->active),
@@ -48,18 +57,27 @@ class BlogController extends Controller {
     }
     public function update ( Request $req, Blog $blog ) {
 
+        if ( Blog::where('slug', $this->slug($req->title))->where('id', '!=', $blog->id)->exists() ) {
+
+            return $this->failed(['title' => 'exists']);
+
+        }
         $data = [
+            'vendor_id' => $this->integer($req->vendor_id),
             'title' => $req->title,
             'slug' => $this->slug($req->title),
-            'content' => $req->content,
             'description' => $req->description,
-            'phone' => $req->phone,
+            'content' => $req->content,
             'company' => $req->company,
+            'phone' => $req->phone,
+            'language' => $req->language,
             'country' => $req->country,
             'city' => $req->city,
+            'street' => $req->street,
             'location' => $req->location,
             'notes' => $req->notes,
             'allow_comments' => $this->bool($req->allow_comments),
+            'allow_replies' => $this->bool($req->allow_replies),
             'allow_likes' => $this->bool($req->allow_likes),
             'allow_dislikes' => $this->bool($req->allow_dislikes),
             'active' => $this->bool($req->active),
@@ -81,12 +99,6 @@ class BlogController extends Controller {
 
         foreach ( $this->parse($req->ids) as $id ) Blog::find($id)?->delete();
         return $this->success();
-
-    }
-    public function comments ( Request $req, Blog $blog ) {
-
-        $comments = CommentResource::for_blog( $blog->comments );
-        return $this->success(['comments' => $comments]);
 
     }
 

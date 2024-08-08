@@ -6,12 +6,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class CommentResource extends JsonResource {
 
-    protected static $with_blog = true;
-    protected static $with_user = true;
-
     public function toArray ( Request $req ) {
 
-        $data = [
+        return [
             'id' => $this->id,
             'content' => $this->content,
             'likes' => $this->likes,
@@ -21,24 +18,13 @@ class CommentResource extends JsonResource {
             'replies' => count($this->replies),
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
+            'vendor_id' => $this->vendor_id,
+            'client_id' => $this->client_id,
+            'blog_id' => $this->blog_id,
+            'blog' => BlogResource::make( $this->blog ),
+            'client' => UserResource::make( $this->client ),
+            'vendor' => UserResource::make( $this->vendor ),
         ];
-
-        if ( self::$with_blog ) $data['blog'] = BlogResource::make( $this->blog );
-        if ( self::$with_user ) $data['user'] = $this->user->role != 1 ? UserResource::make( $this->user ) : 'admin';
-
-        return $data;
-
-    }
-    public static function for_blog ( $resouce ) {
-
-        self::$with_blog = false;
-        return parent::collection( $resouce );
-
-    }
-    public static function for_user ( $resouce ) {
-
-        self::$with_user = false;
-        return parent::collection( $resouce );
 
     }
 

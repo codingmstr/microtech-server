@@ -10,7 +10,9 @@ class Review extends Model {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'user_id',
+        'admin_id',
+        'vendor_id',
+        'client_id',
         'product_id',
         'order_id',
         'content',
@@ -18,9 +20,19 @@ class Review extends Model {
         'active',
     ];
 
-    public function user () {
+    public function admin () {
 
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'admin_id');
+
+    }
+    public function vendor () {
+
+        return $this->belongsTo(User::class, 'vendor_id');
+
+    }
+    public function client () {
+
+        return $this->belongsTo(User::class, 'client_id');
 
     }
     public function product () {

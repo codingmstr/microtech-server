@@ -14,10 +14,14 @@ return new class extends Migration {
             $table->integer('vendor_id')->default(0);
             $table->string('name')->nullable();
             $table->string('email')->nullable();
-            $table->string('phone')->nullable();
             $table->string('address')->nullable();
+            $table->string('company')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('language')->nullable();
             $table->string('country')->nullable();
             $table->string('city')->nullable();
+            $table->string('street')->nullable();
+            $table->string('location')->nullable();
             $table->string('ip')->nullable();
             $table->string('agent')->nullable();
             $table->longText('content')->nullable();

@@ -12,7 +12,7 @@ return new class extends Migration {
             $table->id();
             $table->integer('admin_id')->default(0);
             $table->integer('vendor_id')->default(0);
-            $table->integer('user_id')->default(0);
+            $table->integer('client_id')->default(0);
             $table->integer('blog_id')->default(0);
             $table->longText('content')->nullable();
             $table->integer('likes')->default(0);

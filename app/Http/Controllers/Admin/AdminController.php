@@ -43,18 +43,20 @@ class AdminController extends Controller {
 
         }
         $data = [
-            'role' => 1,
             'admin_id' => $this->user()->id,
+            'role' => 1,
             'name' => $req->name,
             'email' => $req->email,
             'password' => Hash::make($req->password),
-            'language' => $req->language,
             'age' => $this->float($req->age),
             'salary' => $this->float($req->salary),
+            'company' => $req->company,
             'phone' => $req->phone,
+            'language' => $req->language,
             'country' => $req->country,
             'city' => $req->city,
             'street' => $req->street,
+            'location' => $req->location,
             'notes' => $req->notes,
             'ip' => $req->ip(),
             'agent' => $req->userAgent(),
@@ -74,6 +76,8 @@ class AdminController extends Controller {
             'allow_messages' => $this->bool($req->allow_messages),
             'allow_mails' => $this->bool($req->allow_mails),
             'allow_login' => $this->bool($req->allow_login),
+            'allow_likes' => $this->bool($req->allow_likes),
+            'allow_dislikes' => $this->bool($req->allow_dislikes),
             'supervisor' => $this->bool($req->supervisor),
             'active' => $this->bool($req->active),
         ];
@@ -110,15 +114,17 @@ class AdminController extends Controller {
             
         }
         $data = [
-            'name' => $req->name,
+           'name' => $req->name,
             'email' => $req->email,
-            'language' => $req->language,
             'age' => $this->float($req->age),
             'salary' => $this->float($req->salary),
+            'company' => $req->company,
             'phone' => $req->phone,
+            'language' => $req->language,
             'country' => $req->country,
             'city' => $req->city,
             'street' => $req->street,
+            'location' => $req->location,
             'notes' => $req->notes,
             'allow_categories' => $this->bool($req->allow_categories),
             'allow_products' => $this->bool($req->allow_products),
@@ -136,6 +142,8 @@ class AdminController extends Controller {
             'allow_messages' => $this->bool($req->allow_messages),
             'allow_mails' => $this->bool($req->allow_mails),
             'allow_login' => $this->bool($req->allow_login),
+            'allow_likes' => $this->bool($req->allow_likes),
+            'allow_dislikes' => $this->bool($req->allow_dislikes),
             'supervisor' => $this->bool($req->supervisor),
             'active' => $this->bool($req->active),
         ];
