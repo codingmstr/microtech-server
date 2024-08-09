@@ -20,9 +20,9 @@ class ClientController extends Controller {
 
         $orders = $this->charts( Order::where('client_id', $id) );
         $coupons = $this->charts( Coupon::where('client_id', $id) );
-        $reviews = $this->charts( Review::where('user_id', $id) );
-        $comments = $this->charts( Comment::where('user_id', $id) );
-        $replies = $this->charts( Reply::where('user_id', $id) );
+        $reviews = $this->charts( Review::where('client_id', $id) );
+        $comments = $this->charts( Comment::where('client_id', $id) );
+        $replies = $this->charts( Reply::where('client_id', $id) );
 
         return ['orders' => $orders, 'reviews' => $reviews, 'coupons' => $coupons, 'comments' => $comments, 'replies' => $replies];
 
@@ -67,6 +67,7 @@ class ClientController extends Controller {
             'city' => $req->city,
             'street' => $req->street,
             'location' => $req->location,
+            'currency' => $req->currency,
             'notes' => $req->notes,
             'ip' => $req->ip(),
             'agent' => $req->userAgent(),
@@ -93,6 +94,7 @@ class ClientController extends Controller {
 
         $user = User::create($data);
         $this->upload_files([$req->file('image_file')], 'user', $user->id);
+        $this->report($req, 'client', $user->id, 'add', 'admin');
         return $this->success();
 
     }
@@ -132,6 +134,7 @@ class ClientController extends Controller {
             'city' => $req->city,
             'street' => $req->street,
             'location' => $req->location,
+            'currency' => $req->currency,
             'notes' => $req->notes,
             'allow_categories' => $this->bool($req->allow_categories),
             'allow_products' => $this->bool($req->allow_products),
@@ -155,6 +158,7 @@ class ClientController extends Controller {
         ];
 
         $user->update($data);
+        $this->report($req, 'client', $user->id, 'update', 'admin');
         return $this->success();
 
     }
@@ -162,12 +166,17 @@ class ClientController extends Controller {
 
         if ( $user->role != 3 ) return $this->failed(['client' => 'not exists']);
         $user->delete();
+        $this->report($req, 'client', $user->id, 'delete', 'admin');
         return $this->success();
 
     }
     public function delete_group ( Request $req ) {
 
-        foreach ( $this->parse($req->ids) as $id ) User::where('id', $id)->where('role', 3)->delete();
+        foreach ( $this->parse($req->ids) as $id ) {
+            User::where('id', $id)->where('role', 3)->delete();
+            $this->report($req, 'client', $id, 'delete', 'admin');
+        }
+
         return $this->success();
 
     }

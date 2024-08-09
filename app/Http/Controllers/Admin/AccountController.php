@@ -4,7 +4,6 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\AdminResource;
 use Illuminate\Support\Facades\Hash;
 use App\Models\File;
@@ -48,10 +47,12 @@ class AccountController extends Controller {
             'city' => $req->city,
             'street' => $req->street,
             'location' => $req->location,
+            'currency' => $req->currency,
         ];
 
         $user->update($data);
         $user = AdminResource::make( $user );
+        $this->report($req, 'account', 0, 'update', 'admin');
         return $this->success(['user' => $user]);
 
     }
@@ -64,6 +65,7 @@ class AccountController extends Controller {
         }
 
         $user->update(['password' => Hash::make($req->password)]);
+        $this->report($req, 'password', 0, 'change', 'admin');
         return $this->success();
 
     }

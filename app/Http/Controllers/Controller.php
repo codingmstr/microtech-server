@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use App\Models\File;
+use App\Models\Report;
 use DateTime;
 
 abstract class Controller {
@@ -81,6 +82,13 @@ abstract class Controller {
         return strtolower(trim(preg_replace('/\./', '', preg_replace('/\s/', '-', $name))));
 
     }
+    public function string ( $value ) {
+
+        $values = [false, 0, null, '', 'null', 'undefined'];
+        if ( in_array($value, $values) ) return null;
+        return $value ?? null;
+
+    }
     public function bool ( $value ) {
 
         $value = trim(strtolower($value));
@@ -145,6 +153,23 @@ abstract class Controller {
     public function date () {
 
         return date('Y-m-d H:i:s');
+
+    }
+    public function report ( $req, $table='', $column=0, $process='', $creator='', $data=[] ) {
+
+        $inputs = [
+            'table' => $table,
+            'column' => $column,
+            'process' => $process,
+            'ip' => $req->ip(),
+            'agent' => $req->userAgent(),
+        ];
+
+        if ( $creator === 'admin' ) $inputs['admin_id'] = $this->user()->id;
+        if ( $creator === 'vendor' ) $inputs['vendor_id'] = $this->user()->id;
+        if ( $creator === 'client' ) $inputs['client_id'] = $this->user()->id;
+
+        Report::create($inputs + $data);
 
     }
     public function paginate ( $table, $request ) {

@@ -217,21 +217,31 @@ Route::prefix('admin')->group(function(){
         Route::middleware('contacts')->group(function(){
 
             Route::prefix('contact')->group(function(){
+
                 Route::post('', 'App\Http\Controllers\Admin\ContactController@index');
                 Route::post('delete', 'App\Http\Controllers\Admin\ContactController@delete_group');
 
                 Route::prefix('{contact}')->group(function(){
                     Route::post('', 'App\Http\Controllers\Admin\ContactController@show');
+                    Route::post('update', 'App\Http\Controllers\Admin\ContactController@update');
                     Route::post('delete', 'App\Http\Controllers\Admin\ContactController@delete');
                 });
+
             });
 
         });
         Route::middleware('reports')->group(function(){
 
             Route::prefix('report')->group(function(){
+
                 Route::post('', 'App\Http\Controllers\Admin\ReportController@index');
-                Route::post('delete', 'App\Http\Controllers\Admin\ReportController@delete');
+                Route::post('delete', 'App\Http\Controllers\Admin\ReportController@delete_group');
+
+                Route::prefix('{report}')->group(function(){
+                    Route::post('', 'App\Http\Controllers\Admin\ReportController@show');
+                    Route::post('delete', 'App\Http\Controllers\Admin\ReportController@delete');
+                });
+
             });
 
         });

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -33,6 +32,7 @@ class AuthController extends Controller {
         $user->update(['login_at' => $this->date()]);
         $token = $user->createToken($req->userAgent())->plainTextToken;
         $user = AdminResource::make($user);
+        $this->report($req, '', 0, 'login', '', ['admin_id' => $user->id]);
 
         return $this->success(['user' => $user, 'token' => $token]);
 
@@ -54,6 +54,7 @@ class AuthController extends Controller {
     }
     public function logout ( Request $req ) {
 
+        $this->report($req, '', 0, 'logout', 'admin');
         $this->user()->currentAccessToken()->delete();
         return $this->success();
 

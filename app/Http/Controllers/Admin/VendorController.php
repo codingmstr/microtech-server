@@ -62,6 +62,7 @@ class VendorController extends Controller {
             'city' => $req->city,
             'street' => $req->street,
             'location' => $req->location,
+            'currency' => $req->currency,
             'notes' => $req->notes,
             'ip' => $req->ip(),
             'agent' => $req->userAgent(),
@@ -88,6 +89,7 @@ class VendorController extends Controller {
 
         $user = User::create($data);
         $this->upload_files([$req->file('image_file')], 'user', $user->id);
+        $this->report($req, 'vendor', $user->id, 'add', 'admin');
         return $this->success();
 
     }
@@ -127,6 +129,7 @@ class VendorController extends Controller {
             'city' => $req->city,
             'street' => $req->street,
             'location' => $req->location,
+            'currency' => $req->currency,
             'notes' => $req->notes,
             'allow_categories' => $this->bool($req->allow_categories),
             'allow_products' => $this->bool($req->allow_products),
@@ -150,6 +153,7 @@ class VendorController extends Controller {
         ];
 
         $user->update($data);
+        $this->report($req, 'vendor', $user->id, 'update', 'admin');
         return $this->success();
 
     }
@@ -157,12 +161,17 @@ class VendorController extends Controller {
 
         if ( $user->role != 2 ) return $this->failed(['vendor' => 'not exists']);
         $user->delete();
+        $this->report($req, 'vendor', $user->id, 'delete', 'admin');
         return $this->success();
 
     }
     public function delete_group ( Request $req ) {
 
-        foreach ( $this->parse($req->ids) as $id ) User::where('id', $id)->where('role', 2)->delete();
+        foreach ( $this->parse($req->ids) as $id ) {
+            User::where('id', $id)->where('role', 2)->delete();
+            $this->report($req, 'vendor', $id, 'delete', 'admin');
+        }
+
         return $this->success();
 
     }

@@ -10,7 +10,7 @@ return new class extends Migration {
 
         Schema::create('files', function (Blueprint $table) {
             $table->id();
-            $table->enum('table', ['product', 'blog', 'mail', 'message', 'category', 'user']);
+            $table->enum('table', ['product', 'blog', 'mail', 'message', 'category', 'user', 'setting']);
             $table->integer('column')->default(0);
             $table->enum('type', ['image', 'video', 'file']);
             $table->string('name')->nullable();

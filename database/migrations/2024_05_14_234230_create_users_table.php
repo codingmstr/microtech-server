@@ -23,6 +23,7 @@ return new class extends Migration {
             $table->string('city')->nullable();
             $table->string('street')->nullable();
             $table->string('location')->nullable();
+            $table->string('currency')->nullable();
             $table->string('ip')->nullable();
             $table->string('agent')->nullable();
             $table->string('notes')->nullable();

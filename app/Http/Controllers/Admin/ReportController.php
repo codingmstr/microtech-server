@@ -10,11 +10,24 @@ class ReportController extends Controller {
 
     public function index ( Request $req ) {
 
-        $reports = ReportResource::collection( Report::all() );
-        return $this->success(['reports' => $reports]);
+        $data = $this->paginate( Report::query(), $req );
+        $items = ReportResource::collection( $data['items'] );
+        return $this->success(['items' => $items, 'total'=> $data['total']]);
 
     }
-    public function delete ( Request $req ) {
+    public function show ( Request $req, Report $report ) {
+
+        $item = ReportResource::make( $report );
+        return $this->success(['item' => $item]);
+
+    }
+    public function delete ( Request $req, Report $report ) {
+
+        $report->delete();
+        return $this->success();
+
+    }
+    public function delete_group ( Request $req ) {
 
         foreach ( $this->parse($req->ids) as $id ) Report::find($id)?->delete();
         return $this->success();

@@ -57,7 +57,8 @@ class ReviewController extends Controller {
         ];
 
         $review = Review::create($data);
-        return $this->success(['review' => $review]);
+        $this->report($req, 'review', $review->id, 'add', 'admin');
+        return $this->success();
 
     }
     public function update ( Request $req, Review $review ) {
@@ -69,18 +70,24 @@ class ReviewController extends Controller {
         ];
 
         $review->update($data);
+        $this->report($req, 'review', $review->id, 'update', 'admin');
         return $this->success();
 
     }
     public function delete ( Request $req, Review $review ) {
 
         $review->delete();
+        $this->report($req, 'review', $review->id, 'delete', 'admin');
         return $this->success();
 
     }
     public function delete_group ( Request $req ) {
 
-        foreach ( $this->parse($req->ids) as $id ) Review::find($id)?->delete();
+        foreach ( $this->parse($req->ids) as $id ) {
+            Review::find($id)?->delete();
+            $this->report($req, 'review', $id, 'delete', 'admin');
+        }
+
         return $this->success();
 
     }

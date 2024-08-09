@@ -70,7 +70,8 @@ class CouponController extends Controller {
         ];
 
         $coupon = Coupon::create($data);
-        return $this->success(['coupon' => CouponResource::make( $coupon )]);
+        $this->report($req, 'coupon', $coupon->id, 'add', 'admin');
+        return $this->success();
 
     }
     public function update ( Request $req, Coupon $coupon ) {
@@ -93,18 +94,24 @@ class CouponController extends Controller {
         ];
 
         $coupon->update($data);
+        $this->report($req, 'coupon', $coupon->id, 'update', 'admin');
         return $this->success();
 
     }
     public function delete ( Request $req, Coupon $coupon ) {
 
         $coupon->delete();
+        $this->report($req, 'coupon', $coupon->id, 'delete', 'admin');
         return $this->success();
 
     }
     public function delete_group ( Request $req ) {
 
-        foreach ( $this->parse($req->ids) as $id ) Coupon::find($id)?->delete();
+        foreach ( $this->parse($req->ids) as $id ) {
+            Coupon::find($id)?->delete();
+            $this->report($req, 'coupon', $id, 'delete', 'admin');
+        }
+        
         return $this->success();
 
     }

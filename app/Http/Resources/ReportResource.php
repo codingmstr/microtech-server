@@ -18,25 +18,34 @@ use App\Models\Reset;
 
 class ReportResource extends JsonResource {
 
-    public function toArray ( Request $req ) {
+    public function get_item () {
 
-        $action = null;
-        if ( $this->action_table == 'users' ) $action =  UserResource::make( User::find($this->action_column) );
-        if ( $this->action_table == 'categories' ) $action = CategoryResource::make( Category::find($this->action_column) );
-        if ( $this->action_table == 'products' ) $action = ProductResource::make( Product::find($this->action_column) );
-        if ( $this->action_table == 'coupons' ) $action = CouponResource::make( Coupon::find($this->action_column) );
-        if ( $this->action_table == 'orders' ) $action = OrderResource::make( Order::find($this->action_column) );
-        if ( $this->action_table == 'blogs' ) $action = BlogResource::make( Blog::find($this->action_column) );
-        if ( $this->action_table == 'comments' ) $action = CommentResource::make( Comment::find($this->action_column) );
-        if ( $this->action_table == 'replies' ) $action = ReplyResource::make( Reply::find($this->action_column) );
-        if ( $this->action_table == 'contacts' ) $action = ContactResource::make( Contact::find($this->action_column) );
-        if ( $this->action_table == 'reviews' ) $action = ReviewResource::make( Review::find($this->action_column) );
-        if ( $this->action_table == 'payments' ) $action = PaymentResource::make( Payment::find($this->action_column) );
-        if ( $this->action_table == 'resets' ) $action = ResetResource::make( Reset::find($this->action_column) );
+        $item = null;
+
+        if ( $this->table === 'category' ) $item = CategoryResource::make( Category::withTrashed()->find($this->column) );
+        if ( $this->table === 'product' ) $item = ProductResource::make( Product::withTrashed()->find($this->column) );
+        if ( $this->table === 'coupon' ) $item = CouponResource::make( Coupon::withTrashed()->find($this->column) );
+        if ( $this->table === 'order' ) $item = OrderResource::make( Order::withTrashed()->find($this->column) );
+        if ( $this->table === 'review' ) $item = ReviewResource::make( Review::withTrashed()->find($this->column) );
+        if ( $this->table === 'blog' ) $item = BlogResource::make( Blog::withTrashed()->find($this->column) );
+        if ( $this->table === 'comment' ) $item = CommentResource::make( Comment::withTrashed()->find($this->column) );
+        if ( $this->table === 'reply' ) $item = ReplyResource::make( Reply::withTrashed()->find($this->column) );
+        if ( $this->table === 'admin' ) $item = UserResource::make( User::withTrashed()->find($this->column) );
+        if ( $this->table === 'vendor' ) $item = UserResource::make( User::withTrashed()->find($this->column) );
+        if ( $this->table === 'client' ) $item = UserResource::make( User::withTrashed()->find($this->column) );
+        if ( $this->table === 'contact' ) $item = ContactResource::make( Contact::withTrashed()->find($this->column) );
+        if ( $this->table === 'payment' ) $item = PaymentResource::make( Payment::withTrashed()->find($this->column) );
+        if ( $this->table === 'reset' ) $item = ResetResource::make( Reset::withTrashed()->find($this->column) );
+
+        return $item;
+
+    }
+    public function toArray ( Request $req ) {
 
         return [
             'id' => $this->id,
-            'table' => $this->action_table,
+            'table' => $this->table,
+            'column' => $this->column,
             'process' => $this->process,
             'ip' => $this->ip,
             'agent' => $this->agent,
@@ -48,8 +57,9 @@ class ReportResource extends JsonResource {
             'active' => $this->active,
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
-            'user' => UserResource::make( $this->user ),
-            'action' => $action,
+            'info' => ['process' => $this->process, 'table' => $this->table],
+            'user' => UserResource::make( $this->admin ?? $this->vendor ?? $this->client ),
+            'item' => $this->get_item(),
         ];
 
     }

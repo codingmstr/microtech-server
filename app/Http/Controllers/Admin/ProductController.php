@@ -87,6 +87,7 @@ class ProductController extends Controller {
 
         $product = Product::create($data);
         $this->upload_files( $req->allFiles(), 'product', $product->id );
+        $this->report($req, 'product', $product->id, 'add', 'admin');
         return $this->success();
 
     }
@@ -123,18 +124,24 @@ class ProductController extends Controller {
         $product->update($data);
         $this->upload_files( $req->allFiles(), 'product', $product->id );
         $this->delete_files( $this->parse($req->deleted_files), 'product' );
+        $this->report($req, 'product', $product->id, 'update', 'admin');
         return $this->success();
 
     }
     public function delete ( Request $req, Product $product ) {
 
         $product->delete();
+        $this->report($req, 'product', $product->id, 'delete', 'admin');
         return $this->success();
 
     }
     public function delete_group ( Request $req ) {
 
-        foreach ( $this->parse($req->ids) as $id ) Product::find($id)?->delete();
+        foreach ( $this->parse($req->ids) as $id ) {
+            Product::find($id)?->delete();
+            $this->report($req, 'product', $id, 'delete', 'admin');
+        }
+        
         return $this->success();
 
     }

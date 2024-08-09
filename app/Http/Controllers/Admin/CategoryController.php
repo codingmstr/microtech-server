@@ -10,7 +10,7 @@ use App\Models\Coupon;
 use App\Models\File;
 
 class CategoryController extends Controller {
-    
+
     public function statistics ( $id ) {
 
         $products = $this->charts( Product::where('category_id', $id) );
@@ -58,6 +58,7 @@ class CategoryController extends Controller {
 
         $category = Category::create($data);
         $this->upload_files([$req->file('image_file')], 'category', $category->id);
+        $this->report($req, 'category', $category->id, 'add', 'admin');
         return $this->success();
 
     }
@@ -92,18 +93,24 @@ class CategoryController extends Controller {
         ];
 
         $category->update($data);
+        $this->report($req, 'category', $category->id, 'update', 'admin');
         return $this->success();
 
     }
     public function delete ( Request $req, Category $category ) {
 
         $category->delete();
+        $this->report($req, 'category', $category->id, 'delete', 'admin');
         return $this->success();
 
     }
     public function delete_group ( Request $req ) {
 
-        foreach ( $this->parse($req->ids) as $id ) Category::find($id)?->delete();
+        foreach ( $this->parse($req->ids) as $id ) {
+            Category::find($id)?->delete();
+            $this->report($req, 'category', $id, 'delete', 'admin');
+        }
+
         return $this->success();
 
     }

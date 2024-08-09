@@ -57,6 +57,7 @@ class AdminController extends Controller {
             'city' => $req->city,
             'street' => $req->street,
             'location' => $req->location,
+            'currency' => $req->currency,
             'notes' => $req->notes,
             'ip' => $req->ip(),
             'agent' => $req->userAgent(),
@@ -84,6 +85,7 @@ class AdminController extends Controller {
 
         $user = User::create($data);
         $this->upload_files([$req->file('image_file')], 'user', $user->id);
+        $this->report($req, 'admin', $user->id, 'add', 'admin');
         return $this->success();
 
     }
@@ -125,6 +127,7 @@ class AdminController extends Controller {
             'city' => $req->city,
             'street' => $req->street,
             'location' => $req->location,
+            'currency' => $req->currency,
             'notes' => $req->notes,
             'allow_categories' => $this->bool($req->allow_categories),
             'allow_products' => $this->bool($req->allow_products),
@@ -149,6 +152,7 @@ class AdminController extends Controller {
         ];
 
         $user->update($data);
+        $this->report($req, 'admin', $user->id, 'update', 'admin');
         return $this->success();
 
     }
@@ -158,6 +162,7 @@ class AdminController extends Controller {
         if ( !$this->user()->super && $user->admin_id != $this->user()->id ) return $this->failed(['admin' => 'not exists']);
 
         $user->delete();
+        $this->report($req, 'admin', $user->id, 'delete', 'admin');
         return $this->success();
 
     }
@@ -168,6 +173,7 @@ class AdminController extends Controller {
             $user = User::where('id', $id)->where('id', '!=', $this->user()->id)->where('super', false);
             if ( !$this->user()->super ) $user->where('admin_id', $this->user()->id);
             $user->delete();
+            $this->report($req, 'admin', $id, 'delete', 'admin');
 
         }
 

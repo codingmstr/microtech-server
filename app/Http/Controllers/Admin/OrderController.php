@@ -87,31 +87,32 @@ class OrderController extends Controller {
             'client_id' => $this->integer($req->client_id),
             'product_id' => $this->integer($req->product_id),
             'coupon_id' => $this->integer($req->coupon_id),
-            'name' => $req->name,
-            'email' => $req->email,
-            'address' => $req->address,
-            'company' => $req->company,
-            'phone' => $req->phone,
-            'language' => $req->language,
-            'country' => $req->country,
-            'city' => $req->city,
-            'street' => $req->street,
-            'location' => $req->location,
-            'notes' => $req->notes,
+            'name' => $this->string($req->name),
+            'email' => $this->string($req->email),
+            'address' => $this->string($req->address),
+            'company' => $this->string($req->company),
+            'phone' => $this->string($req->phone),
+            'language' => $this->string($req->language),
+            'country' => $this->string($req->country),
+            'city' => $this->string($req->city),
+            'street' => $this->string($req->street),
+            'location' => $this->string($req->location),
+            'notes' => $this->string($req->notes),
             'secret_key' => $secret_key,
             'price' => $price,
             'coupon_discount' => $coupon_discount,
             'coupon_code' => $coupon_code,
             'paid' => $this->bool($req->paid),
-            'status' => $req->status ?? 'pending',
+            'status' => $this->string($req->status ?? 'pending'),
             'active' => $this->bool($req->active),
             'paid_at' => $paid_at,
             'confirmed_at' => $confirmed_at,
             'cancelled_at' => $cancelled_at,
-            'ordered_at' => $req->ordered_at,
+            'ordered_at' => $this->string($req->ordered_at),
         ];
 
-        Order::create($data);
+        $order = Order::create($data);
+        $this->report($req, 'order', $order->id, 'add', 'admin', ['price' => $order->price, 'paid' => $order->paid, 'status' => $order->status]);
         return $this->success();
 
     }
@@ -128,36 +129,44 @@ class OrderController extends Controller {
         }
 
         $data = [
-            'name' => $req->name,
-            'email' => $req->email,
-            'address' => $req->address,
-            'company' => $req->company,
-            'phone' => $req->phone,
-            'language' => $req->language,
-            'country' => $req->country,
-            'city' => $req->city,
-            'street' => $req->street,
-            'location' => $req->location,
-            'notes' => $req->notes,
+            'name' => $this->string($req->name),
+            'email' => $this->string($req->email),
+            'address' => $this->string($req->address),
+            'company' => $this->string($req->company),
+            'phone' => $this->string($req->phone),
+            'language' => $this->string($req->language),
+            'country' => $this->string($req->country),
+            'city' => $this->string($req->city),
+            'street' => $this->string($req->street),
+            'location' => $this->string($req->location),
+            'notes' => $this->string($req->notes),
             'paid' => $this->bool($req->paid),
-            'ordered_at' => $req->ordered_at,
-            'status' => $req->status,
+            'ordered_at' => $this->string($req->ordered_at),
+            'status' => $this->string($req->status),
             'active' => $this->bool($req->active),
         ];
 
         $order->update($data);
+        $this->report($req, 'order', $order->id, 'update', 'admin', ['price' => $order->price, 'paid' => $order->paid, 'status' => $order->status]);
         return $this->success();
 
     }
     public function delete ( Request $req, Order $order ) {
 
+        $this->report($req, 'order', $order->id, 'delete', 'admin', ['price' => $order->price, 'paid' => $order->paid, 'status' => $order->status]);
         $order->delete();
         return $this->success();
 
     }
     public function delete_group ( Request $req ) {
 
-        foreach ( $this->parse($req->ids) as $id ) Order::find($id)?->delete();
+        foreach ( $this->parse($req->ids) as $id ) {
+            $order = Order::find($id);
+            if ( !$order ) continue;
+            $this->report($req, 'order', $id, 'delete', 'admin', ['price' => $order->price, 'paid' => $order->paid, 'status' => $order->status]);
+            $order->delete();
+        }
+
         return $this->success();
 
     }

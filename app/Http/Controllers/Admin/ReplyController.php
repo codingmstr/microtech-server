@@ -61,7 +61,8 @@ class ReplyController extends Controller {
             'active' => $this->bool($req->active),
         ];
 
-        $comment = Reply::create($data);
+        $reply = Reply::create($data);
+        $this->report($req, 'reply', $reply->id, 'add', 'admin');
         return $this->success();
 
     }
@@ -73,18 +74,24 @@ class ReplyController extends Controller {
         ];
 
         $reply->update($data);
+        $this->report($req, 'reply', $reply->id, 'update', 'admin');
         return $this->success();
 
     }
     public function delete ( Request $req, Reply $reply ) {
 
         $reply->delete();
+        $this->report($req, 'reply', $reply->id, 'delete', 'admin');
         return $this->success();
 
     }
     public function delete_group ( Request $req ) {
 
-        foreach ( $this->parse($req->ids) as $id ) Reply::find($id)?->delete();
+        foreach ( $this->parse($req->ids) as $id ) {
+            Reply::find($id)?->delete();
+            $this->report($req, 'reply', $id, 'delete', 'admin');
+        }
+
         return $this->success();
 
     }

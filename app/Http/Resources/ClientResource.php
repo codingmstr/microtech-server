@@ -24,6 +24,7 @@ class ClientResource extends JsonResource {
             'city' => $this->city,
             'street' => $this->street,
             'location' => $this->location,
+            'currency' => $this->currency,
             'ip' => $this->ip,
             'agent' => $this->agent,
             'balance' => $this->balance,

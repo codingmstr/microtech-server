@@ -56,7 +56,8 @@ class CommentController extends Controller {
             'active' => $this->bool($req->active),
         ];
 
-        Comment::create($data);
+        $comment = Comment::create($data);
+        $this->report($req, 'comment', $comment->id, 'add', 'admin');
         return $this->success();
 
     }
@@ -69,18 +70,24 @@ class CommentController extends Controller {
         ];
 
         $comment->update($data);
+        $this->report($req, 'comment', $comment->id, 'update', 'admin');
         return $this->success();
 
     }
     public function delete ( Request $req, Comment $comment ) {
 
         $comment->delete();
+        $this->report($req, 'comment', $comment->id, 'delete', 'admin');
         return $this->success();
 
     }
     public function delete_group ( Request $req ) {
 
-        foreach ( $this->parse($req->ids) as $id ) Comment::find($id)?->delete();
+        foreach ( $this->parse($req->ids) as $id ) {
+            Comment::find($id)?->delete();
+            $this->report($req, 'comment', $id, 'delete', 'admin');
+        }
+    
         return $this->success();
 
     }

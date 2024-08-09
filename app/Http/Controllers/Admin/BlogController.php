@@ -52,6 +52,7 @@ class BlogController extends Controller {
 
         $blog = Blog::create($data);
         $this->upload_files( $req->allFiles(), 'blog', $blog->id );
+        $this->report($req, 'blog', $blog->id, 'add', 'admin');
         return $this->success();
 
     }
@@ -86,18 +87,24 @@ class BlogController extends Controller {
         $blog->update($data);
         $this->upload_files( $req->allFiles(), 'blog', $blog->id );
         $this->delete_files( $this->parse($req->deleted_files), 'blog' );
+        $this->report($req, 'blog', $blog->id, 'update', 'admin');
         return $this->success();
 
     }
     public function delete ( Request $req, Blog $blog ) {
 
         $blog->delete();
+        $this->report($req, 'blog', $blog->id, 'delete', 'admin');
         return $this->success();
 
     }
     public function delete_group ( Request $req ) {
 
-        foreach ( $this->parse($req->ids) as $id ) Blog::find($id)?->delete();
+        foreach ( $this->parse($req->ids) as $id ) {
+            Blog::find($id)?->delete();
+            $this->report($req, 'blog', $id, 'delete', 'admin');
+        }
+
         return $this->success();
 
     }

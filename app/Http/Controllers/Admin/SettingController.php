@@ -50,6 +50,8 @@ class SettingController extends Controller {
         ];
 
         $setting->update($data);
+        $this->report($req, 'setting', 0, 'update', 'admin');
+
         return $this->success();
 
     }
@@ -74,6 +76,8 @@ class SettingController extends Controller {
         ];
 
         $setting->update($data);
+        $this->report($req, 'setting', 0, 'update', 'admin');
+
         return $this->success();
 
     }
@@ -97,6 +101,8 @@ class SettingController extends Controller {
         if ( $table == 'vendors' ) { User::where('role', 2)->delete(); }
         if ( $table == 'admins' ) { User::where('role', 1)->where('supervisor', false)->delete(); }
         if ( $table == 'supervisors' ) { User::where('role', 1)->where('super', false)->where('supervisor', true)->delete(); }
+
+        $this->report($req, $table, 0, 'delete', 'admin');
 
         return $this->success();
 

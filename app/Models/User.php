@@ -25,6 +25,7 @@ class User extends Authenticatable {
         'city',
         'street',
         'location',
+        'currency',
         'age',
         'ip',
         'agent',

@@ -23,6 +23,7 @@ class UserResource extends JsonResource {
             'city' => $this->city,
             'street' => $this->street,
             'location' => $this->location,
+            'currency' => $this->currency,
             'role' => $this->role,
             'super' => $this->super,
             'supervisor' => $this->supervisor,
