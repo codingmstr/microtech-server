@@ -301,6 +301,7 @@ Route::prefix('admin')->group(function(){
             Route::prefix('setting')->group(function(){
                 Route::post('', 'App\Http\Controllers\Admin\SettingController@index');
                 Route::post('update', 'App\Http\Controllers\Admin\SettingController@update');
+                Route::post('content', 'App\Http\Controllers\Admin\SettingController@content');
                 Route::post('option', 'App\Http\Controllers\Admin\SettingController@option');
                 Route::post('delete', 'App\Http\Controllers\Admin\SettingController@delete');
             });

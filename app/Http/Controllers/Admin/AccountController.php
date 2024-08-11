@@ -37,17 +37,17 @@ class AccountController extends Controller {
 
         }
         $data = [
-            'name' => $req->name,
-            'email' => $req->email,
+            'name' => $this->string($req->name),
+            'email' => $this->string($req->email),
             'age' => $this->float($req->age),
-            'company' => $req->company,
-            'phone' => $req->phone,
-            'language' => $req->language,
-            'country' => $req->country,
-            'city' => $req->city,
-            'street' => $req->street,
-            'location' => $req->location,
-            'currency' => $req->currency,
+            'company' => $this->string($req->company),
+            'phone' => $this->string($req->phone),
+            'language' => $this->string($req->language),
+            'country' => $this->string($req->country),
+            'city' => $this->string($req->city),
+            'street' => $this->string($req->street),
+            'location' => $this->string($req->location),
+            'currency' => $this->string($req->currency),
         ];
 
         $user->update($data);

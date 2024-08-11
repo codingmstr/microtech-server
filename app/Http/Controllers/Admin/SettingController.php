@@ -19,6 +19,7 @@ use App\Models\Mail;
 use App\Models\Relation;
 use App\Models\Message;
 use App\Models\User;
+use App\Models\File;
 
 class SettingController extends Controller {
 
@@ -33,25 +34,61 @@ class SettingController extends Controller {
         $setting = Setting::find(1);
 
         $data = [
-            'name' => $req->name,
-            'email' => $req->email,
-            'phone' => $req->phone,
-            'country' => $req->country,
-            'city' => $req->city,
-            'location' => $req->location,
-            'language' => $req->language,
-            'facebook' => $req->facebook,
-            'whatsapp' => $req->whatsapp,
-            'youtube' => $req->youtube,
-            'linkedin' => $req->linkedin,
-            'instagram' => $req->instagram,
-            'telegram' => $req->telegram,
-            'twitter' => $req->twitter,
+            'name' => $this->string($req->name),
+            'email' => $this->string($req->email),
+            'email1' => $this->string($req->email1),
+            'phone' => $this->string($req->phone),
+            'phone1' => $this->string($req->phone1),
+            'company' => $this->string($req->company),
+            'code' => $this->string($req->code),
+            'language' => $this->string($req->language),
+            'currency' => $this->string($req->currency),
+            'theme' => $this->string($req->theme),
+            'country' => $this->string($req->country),
+            'city' => $this->string($req->city),
+            'street' => $this->string($req->street),
+            'location' => $this->string($req->location),
+            'facebook' => $this->string($req->facebook),
+            'whatsapp' => $this->string($req->whatsapp),
+            'youtube' => $this->string($req->youtube),
+            'linkedin' => $this->string($req->linkedin),
+            'instagram' => $this->string($req->instagram),
+            'telegram' => $this->string($req->telegram),
+            'twitter' => $this->string($req->twitter),
+        ];
+        
+        $setting->update($data);
+        $this->report($req, 'setting', 0, 'update', 'admin');
+        return $this->success();
+
+    }
+    public function content ( Request $req ) {
+
+        $setting = Setting::find(1);
+
+        $data = [
+            'about' => $this->string($req->about),
+            'terms' => $this->string($req->terms),
+            'policy' => $this->string($req->policy),
+            'services' => $this->string($req->services),
+            'help' => $this->string($req->help),
         ];
 
         $setting->update($data);
-        $this->report($req, 'setting', 0, 'update', 'admin');
 
+        $slider = array_filter($req->allFiles(), function ( $key, $value ) { return $value !== 'logo_file'; }, ARRAY_FILTER_USE_BOTH);
+        $this->upload_files( $slider, 'slider', $setting->id );
+        $this->delete_files( $this->parse($req->deleted_files), 'slider' );
+
+        if ( $req->file('logo_file') ) {
+
+            $file_id = File::where('table', 'logo')->where('column', $setting->id)->first()?->id;
+            $this->delete_files([$file_id], 'logo');
+            $this->upload_files([$req->file('logo_file')], 'logo', $setting->id);
+
+        }
+
+        $this->report($req, 'setting', 0, 'update', 'admin');
         return $this->success();
 
     }
@@ -62,16 +99,25 @@ class SettingController extends Controller {
         $data = [
             'allow_mails' => $this->bool($req->allow_mails),
             'allow_messages' => $this->bool($req->allow_messages),
-            'allow_registerations' => $this->bool($req->allow_registerations),
-            'allow_logins' => $this->bool($req->allow_logins),
+            'allow_notifications' => $this->bool($req->allow_notifications),
+            'allow_categories' => $this->bool($req->allow_categories),
             'allow_products' => $this->bool($req->allow_products),
             'allow_coupons' => $this->bool($req->allow_coupons),
             'allow_orders' => $this->bool($req->allow_orders),
             'allow_blogs' => $this->bool($req->allow_blogs),
+            'allow_comments' => $this->bool($req->allow_comments),
+            'allow_replies' => $this->bool($req->allow_replies),
+            'allow_reviews' => $this->bool($req->allow_reviews),
             'allow_contacts' => $this->bool($req->allow_contacts),
+            'allow_reports' => $this->bool($req->allow_reports),
             'allow_emails' => $this->bool($req->allow_emails),
-            'allow_notifications' => $this->bool($req->allow_notifications),
-            'theme' => $req->theme,
+            'allow_logins' => $this->bool($req->allow_logins),
+            'allow_vendors' => $this->bool($req->allow_vendors),
+            'allow_clients' => $this->bool($req->allow_clients),
+            'allow_deposits' => $this->bool($req->allow_deposits),
+            'allow_withdraws' => $this->bool($req->allow_withdraws),
+            'allow_payments' => $this->bool($req->allow_payments),
+            'allow_pay_later' => $this->bool($req->allow_pay_later),
             'running' => $this->bool($req->running),
         ];
 

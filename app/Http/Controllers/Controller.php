@@ -84,8 +84,8 @@ abstract class Controller {
     }
     public function string ( $value ) {
 
-        $values = [false, 0, null, '', 'null', 'undefined'];
-        if ( in_array($value, $values) ) return null;
+        $values = ['', 'null', 'undefined'];
+        if ( in_array(strval($value), $values) ) return null;
         return $value ?? null;
 
     }
@@ -153,6 +153,47 @@ abstract class Controller {
     public function date () {
 
         return date('Y-m-d H:i:s');
+
+    }
+    public function user_table ( $req ) {
+
+        $data = [
+            'name' => $this->string($req->name),
+            'email' => $this->string($req->email),
+            'age' => $this->float($req->age),
+            'salary' => $this->float($req->salary),
+            'company' => $this->string($req->company),
+            'phone' => $this->string($req->phone),
+            'language' => $this->string($req->language),
+            'country' => $this->string($req->country),
+            'city' => $this->string($req->city),
+            'street' => $this->string($req->street),
+            'location' => $this->string($req->location),
+            'currency' => $this->string($req->currency),
+            'notes' => $this->string($req->notes),
+            'allow_categories' => $this->bool($req->allow_categories),
+            'allow_products' => $this->bool($req->allow_products),
+            'allow_coupons' => $this->bool($req->allow_coupons),
+            'allow_orders' => $this->bool($req->allow_orders),
+            'allow_blogs' => $this->bool($req->allow_blogs),
+            'allow_comments' => $this->bool($req->allow_comments),
+            'allow_replies' => $this->bool($req->allow_replies),
+            'allow_reports' => $this->bool($req->allow_reports),
+            'allow_reviews' => $this->bool($req->allow_reviews),
+            'allow_contacts' => $this->bool($req->allow_contacts),
+            'allow_clients' => $this->bool($req->allow_clients),
+            'allow_vendors' => $this->bool($req->allow_vendors),
+            'allow_statistics' => $this->bool($req->allow_statistics),
+            'allow_messages' => $this->bool($req->allow_messages),
+            'allow_mails' => $this->bool($req->allow_mails),
+            'allow_login' => $this->bool($req->allow_login),
+            'allow_likes' => $this->bool($req->allow_likes),
+            'allow_dislikes' => $this->bool($req->allow_dislikes),
+            'supervisor' => $this->bool($req->supervisor),
+            'active' => $this->bool($req->active),
+        ];
+
+        return $data;
 
     }
     public function report ( $req, $table='', $column=0, $process='', $creator='', $data=[] ) {

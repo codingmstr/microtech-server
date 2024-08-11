@@ -51,7 +51,7 @@ class CommentController extends Controller {
             'vendor_id' => $this->integer($req->vendor_id),
             'client_id' => $this->integer($req->client_id),
             'blog_id' => $this->integer($req->blog_id),
-            'content' => $req->content,
+            'content' => $this->string($req->content),
             'allow_replies' => $this->bool($req->allow_replies),
             'active' => $this->bool($req->active),
         ];
@@ -64,7 +64,7 @@ class CommentController extends Controller {
     public function update ( Request $req, Comment $comment ) {
 
         $data = [
-            'content' => $req->content,
+            'content' => $this->string($req->content),
             'allow_replies' => $this->bool($req->allow_replies),
             'active' => $this->bool($req->active),
         ];

@@ -41,10 +41,10 @@ class MailController extends Controller {
 
         $data = [
             'sender_id' => $this->user()->id,
-            'receiver_id' => $req->user_id,
-            'title' => $req->title,
-            'description' => $req->description,
-            'content' => $req->content,
+            'receiver_id' => $user->id,
+            'title' => $this->string($req->title),
+            'description' => $this->string($req->description),
+            'content' => $this->string($req->content),
         ];
 
         $mail = Mail::create($data);

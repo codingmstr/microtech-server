@@ -51,7 +51,7 @@ class ReviewController extends Controller {
             'vendor_id' => $this->integer($req->vendor_id),
             'client_id' => $this->integer($req->client_id),
             'product_id' => $this->integer($req->product_id),
-            'content' => $req->content,
+            'content' => $this->string($req->content),
             'rate' => $this->float($req->rate),
             'active' => $this->bool($req->active),
         ];
@@ -64,7 +64,7 @@ class ReviewController extends Controller {
     public function update ( Request $req, Review $review ) {
 
         $data = [
-            'content' => $req->content,
+            'content' => $this->string($req->content),
             'rate' => $this->float($req->rate),
             'active' => $this->bool($req->active),
         ];

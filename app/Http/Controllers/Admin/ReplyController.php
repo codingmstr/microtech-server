@@ -57,7 +57,7 @@ class ReplyController extends Controller {
             'client_id' => $this->integer($req->client_id),
             'comment_id' => $this->integer($req->comment_id),
             'blog_id' => Comment::find($req->comment_id)->blog->id,
-            'content' => $req->content,
+            'content' => $this->string($req->content),
             'active' => $this->bool($req->active),
         ];
 
@@ -69,7 +69,7 @@ class ReplyController extends Controller {
     public function update ( Request $req, Reply $reply ) {
 
         $data = [
-            'content' => $req->content,
+            'content' => $this->string($req->content),
             'active' => $this->bool($req->active),
         ];
 

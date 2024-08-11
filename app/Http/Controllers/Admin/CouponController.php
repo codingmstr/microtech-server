@@ -51,20 +51,17 @@ class CouponController extends Controller {
     }
     public function store ( Request $req ) {
 
-        if ( Coupon::where('name', $req->name)->exists() ) {
+        if ( Coupon::where('name', $req->name)->exists() ) return $this->failed(['name' => 'exists']);
 
-            return $this->failed(['name' => 'exists']);
-
-        }
         $data = [
             'admin_id' => $this->user()->id,
             'category_id' => $this->integer($req->category_id),
             'product_id' => $this->integer($req->product_id),
             'vendor_id' => $this->integer($req->vendor_id),
             'client_id' => $this->integer($req->client_id),
-            'name' => $req->name,
+            'name' => $this->string($req->name),
             'discount' => $this->float($req->discount),
-            'notes' => $req->notes,
+            'notes' => $this->string($req->notes),
             'allow_orders' => $this->bool($req->allow_orders),
             'active' => $this->bool($req->active),
         ];
@@ -76,19 +73,16 @@ class CouponController extends Controller {
     }
     public function update ( Request $req, Coupon $coupon ) {
 
-        if ( Coupon::where('name', $req->name)->where('id', '!=', $coupon->id)->exists() ) {
+        if ( Coupon::where('name', $req->name)->where('id', '!=', $coupon->id)->exists() ) return $this->failed(['name' => 'exists']);
 
-            return $this->failed(['name' => 'exists']);
-
-        }
         $data = [
             'category_id' => $this->integer($req->category_id),
             'product_id' => $this->integer($req->product_id),
             'vendor_id' => $this->integer($req->vendor_id),
             'client_id' => $this->integer($req->client_id),
-            'name' => $req->name,
+            'name' => $this->string($req->name),
             'discount' => $this->float($req->discount),
-            'notes' => $req->notes,
+            'notes' => $this->string($req->notes),
             'allow_orders' => $this->bool($req->allow_orders),
             'active' => $this->bool($req->active),
         ];
