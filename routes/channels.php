@@ -10,3 +10,6 @@ Broadcast::channel('chat.{user_id}', function ( $user, $user_id ) {
 Broadcast::channel('mail.{user_id}', function ( $user, $user_id ) {
     return $user->id == $user_id;
 });
+Broadcast::channel('notification', function ( $user ) {
+    return $user->role == 1 && $user->allow_reports;
+});

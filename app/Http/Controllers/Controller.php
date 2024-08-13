@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
-use App\Models\File;
+use App\Http\Resources\ReportResource;
 use App\Models\Report;
+use App\Events\Notify;
+use App\Models\File;
 use DateTime;
 
 abstract class Controller {
@@ -210,7 +212,9 @@ abstract class Controller {
         if ( $creator === 'vendor' ) $inputs['vendor_id'] = $this->user()->id;
         if ( $creator === 'client' ) $inputs['client_id'] = $this->user()->id;
 
-        Report::create($inputs + $data);
+        $report = Report::create($inputs + $data);
+        $report = ReportResource::make( $report );
+        event(new Notify($this->user()->id, $report));
 
     }
     public function paginate ( $table, $request ) {
