@@ -208,13 +208,14 @@ abstract class Controller {
             'agent' => $req->userAgent(),
         ];
 
-        if ( $creator === 'admin' ) $inputs['admin_id'] = $this->user()->id;
-        if ( $creator === 'vendor' ) $inputs['vendor_id'] = $this->user()->id;
-        if ( $creator === 'client' ) $inputs['client_id'] = $this->user()->id;
+        if ( $creator === 'admin' ) $inputs['admin_id'] = $this->user()?->id;
+        if ( $creator === 'vendor' ) $inputs['vendor_id'] = $this->user()?->id;
+        if ( $creator === 'client' ) $inputs['client_id'] = $this->user()?->id;
 
         $report = Report::create($inputs + $data);
         $report = ReportResource::make( $report );
-        event(new Notify($this->user()->id, $report));
+
+        event(new Notify($this->user()?->id, $report));
 
     }
     public function paginate ( $table, $request ) {
