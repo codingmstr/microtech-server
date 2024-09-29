@@ -8,6 +8,7 @@ use App\Http\Resources\CommentResource;
 use App\Http\Resources\UserResource;
 use App\Models\Comment;
 use App\Models\Blog;
+use App\Models\Reply;
 use App\Models\User;
 
 class CommentController extends Controller {
@@ -32,7 +33,13 @@ class CommentController extends Controller {
 
         $data = $this->paginate( Comment::query(), $req );
         $items = CommentResource::collection( $data['items'] );
-        return $this->success(['items' => $items, 'total'=> $data['total']]);
+        $tags = [
+            'total' => $data['total'],
+            'replies' => Reply::query()->count(),
+            'vendors' => User::where('role', '2')->count(),
+            'clients' => User::where('role', '1')->count(),
+        ];
+        return $this->success(['items' => $items, 'total'=> $data['total'], 'tags' => $tags]);
 
     }
     public function show ( Request $req, Comment $comment ) {

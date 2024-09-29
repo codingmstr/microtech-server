@@ -10,6 +10,7 @@ use App\Http\Resources\UserResource;
 use App\Models\Reply;
 use App\Models\Blog;
 use App\Models\Comment;
+use App\Models\Review;
 use App\Models\User;
 
 class ReplyController extends Controller {
@@ -37,7 +38,13 @@ class ReplyController extends Controller {
 
         $data = $this->paginate( Reply::query(), $req );
         $items = ReplyResource::collection( $data['items'] );
-        return $this->success(['items' => $items, 'total'=> $data['total']]);
+        $tags = [
+            'total' => $data['total'],
+            'blogs' => Blog::query()->count(),
+            'comments' => Comment::query()->count(),
+            'reviews' => Review::query()->count(),
+        ];
+        return $this->success(['items' => $items, 'total'=> $data['total'], 'tags' => $tags]);
 
     }
     public function show ( Request $req, Reply $reply ) {

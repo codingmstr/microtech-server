@@ -32,7 +32,13 @@ class ReviewController extends Controller {
 
         $data = $this->paginate( Review::query(), $req );
         $items = ReviewResource::collection( $data['items'] );
-        return $this->success(['items' => $items, 'total'=> $data['total']]);
+        $tags = [
+            'total' => $data['total'],
+            'products' => Product::query()->count(),
+            'vendors' => User::where('role', '2')->count(),
+            'clients' => User::where('role', '1')->count(),
+        ];
+        return $this->success(['items' => $items, 'total'=> $data['total'], 'tags' => $tags]);
         
     }
     public function show ( Request $req, Review $review ) {

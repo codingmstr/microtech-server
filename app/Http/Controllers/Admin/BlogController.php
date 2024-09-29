@@ -5,6 +5,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\BlogResource;
 use App\Models\Blog;
+use App\Models\Comment;
+use App\Models\Reply;
+use App\Models\Review;
 
 class BlogController extends Controller {
 
@@ -12,7 +15,13 @@ class BlogController extends Controller {
 
         $data = $this->paginate( Blog::query(), $req );
         $items = BlogResource::collection( $data['items'] );
-        return $this->success(['items' => $items, 'total'=> $data['total']]);
+        $tags = [
+            'total' => $data['total'],
+            'comments' => Comment::query()->count(),
+            'replies' => Reply::query()->count(),
+            'reviews' => Review::query()->count(),
+        ];
+        return $this->success(['items' => $items, 'total'=> $data['total'], 'tags' => $tags]);
 
     }
     public function show ( Request $req, Blog $blog ) {

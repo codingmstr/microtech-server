@@ -44,7 +44,13 @@ class ProductController extends Controller {
 
         $data = $this->paginate( Product::query(), $req );
         $items = ProductResource::collection( $data['items'] );
-        return $this->success(['items' => $items, 'total'=> $data['total']]);
+        $tags = [
+            'total' => $data['total'],
+            'orders' => Order::query()->count(),
+            'reviews' => Review::query()->count(),
+            'coupons' => Coupon::query()->count(),
+        ];
+        return $this->success(['items' => $items, 'total'=> $data['total'], 'tags' => $tags]);
 
     }
     public function show ( Request $req, Product $product ) {

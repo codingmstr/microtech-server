@@ -37,7 +37,15 @@ class OrderController extends Controller {
 
         $data = $this->paginate( Order::query(), $req );
         $items = OrderResource::collection( $data['items'] );
-        return $this->success(['items' => $items, 'total'=> $data['total']]);
+
+        $tags = [
+            'total' => $data['total'],
+            'confirmed' => Order::where('status', 'confirmed')->count(),
+            'cancelled' => Order::where('status', 'cancelled')->count(),
+            'pending' => Order::where('status', 'pending')->count(),
+        ];
+
+        return $this->success(['items' => $items, 'total'=> $data['total'], 'tags' => $tags]);
 
     }
     public function show ( Request $req, Order $order ) {

@@ -226,11 +226,12 @@ abstract class Controller {
         $filters = $request->filters;
         $filter = $request->filter;
         $count = $table->count();
+        $name = $table->first()->getTable();
         $items = $table->orderBy("id", $filter === 'oldest' ? 'asc' : 'desc');
 
         if ( $search ) {
 
-            $columns = Schema::getColumnListing( $table->first()->getTable() );
+            $columns = Schema::getColumnListing($name);
             $search = trim($search);
 
             $items = $items->where('id', $search)
@@ -254,6 +255,11 @@ abstract class Controller {
                 $items = $items->where($key, $value);
                 $count = $items->count();
             }
+
+        }
+        if ( $filter && $filter !== 'oldest' && $filter !== 'newest' ) {
+
+            if ( $name === 'orders' ) $items = $items->where('status', $filter);
 
         }
         if ( $limit ) {

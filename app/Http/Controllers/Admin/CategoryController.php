@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Order;
 use App\Models\Coupon;
+use App\Models\User;
 use App\Models\File;
 
 class CategoryController extends Controller {
@@ -22,7 +24,13 @@ class CategoryController extends Controller {
 
         $data = $this->paginate( Category::query(), $req );
         $items = CategoryResource::collection( $data['items'] );
-        return $this->success(['items' => $items, 'total'=> $data['total']]);
+        $tags = [
+            'total' => $data['total'],
+            'products' => Product::query()->count(),
+            'vendors' => User::where('role', '2')->count(),
+            'clients' => User::where('role', '1')->count(),
+        ];
+        return $this->success(['items' => $items, 'total'=> $data['total'], 'tags' => $tags]);
 
     }
     public function show ( Request $req, Category $category ) {

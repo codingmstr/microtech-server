@@ -5,6 +5,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Resources\ContactResource;
 use App\Models\Contact;
+use App\Models\Review;
+use App\Models\User;
 
 class ContactController extends Controller {
 
@@ -12,7 +14,13 @@ class ContactController extends Controller {
 
         $data = $this->paginate( Contact::query(), $req );
         $items = ContactResource::collection( $data['items'] );
-        return $this->success(['items' => $items, 'total'=> $data['total']]);
+        $tags = [
+            'total' => $data['total'],
+            'vendors' => User::where('role', '2')->count(),
+            'clients' => User::where('role', '1')->count(),
+            'reviews' => Review::query()->count(),
+        ];
+        return $this->success(['items' => $items, 'total'=> $data['total'], 'tags' => $tags]);
 
     }
     public function show ( Request $req, Contact $contact ) {
