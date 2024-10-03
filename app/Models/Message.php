@@ -12,6 +12,7 @@ class Message extends Model {
     protected $fillable = [
         'sender_id',
         'receiver_id',
+        'product_id',
         'type',
         'content',
         'removed_sender',
@@ -33,6 +34,11 @@ class Message extends Model {
     public function receiver () {
 
         return $this->belongsTo(User::class, 'receiver_id');
+
+    }
+    public function product () {
+
+        return $this->belongsTo(Product::class);
 
     }
 

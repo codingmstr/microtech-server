@@ -13,11 +13,11 @@ use App\Events\ChatBox;
 
 class MessageController extends Controller {
 
-    public $current_id = 1;
+    public $admin_id = 1;
 
     public function _active_ ( $user ) {
 
-        Message::where('receiver_id', $this->current_id)
+        Message::where('receiver_id', $this->admin_id)
             ->where('sender_id', $user->id)
             ->where('removed_receiver', false)
             ->where('readen', false)
@@ -28,23 +28,23 @@ class MessageController extends Controller {
     }
     public function _new_ ( $user_id ) {
 
-        $relation = Relation::where('sender_id', $this->current_id)
+        $relation = Relation::where('sender_id', $this->admin_id)
                     ->where('receiver_id', $user_id)
-                    ->orWhere('receiver_id', $this->current_id)
+                    ->orWhere('receiver_id', $this->admin_id)
                     ->where('sender_id', $user_id)
                     ->first();
 
         if ( $relation) $relation->update(['removed_sender' => false, 'removed_receiver' => false]);
-        else $relation = Relation::create(['sender_id' => $this->current_id, 'receiver_id' => $user_id]);
+        else $relation = Relation::create(['sender_id' => $this->admin_id, 'receiver_id' => $user_id]);
 
         return $relation;
 
     }
     public function relations ( Request $req ) {
 
-        $relations = Relation::where('sender_id', $this->current_id)
+        $relations = Relation::where('sender_id', $this->admin_id)
                         ->where('removed_sender', false)
-                        ->orWhere('receiver_id', $this->current_id)
+                        ->orWhere('receiver_id', $this->admin_id)
                         ->where('removed_receiver', false)
                         ->get();
 
@@ -59,13 +59,13 @@ class MessageController extends Controller {
 
         self::_active_($user);
 
-        $messages = Message::where('sender_id', $this->current_id)
+        $messages = Message::where('sender_id', $this->admin_id)
                         ->where('receiver_id', $user->id)
                         ->where('removed_sender', false)
-                        ->orWhere('receiver_id', $this->current_id)
+                        ->orWhere('receiver_id', $this->admin_id)
                         ->where('sender_id', $user->id)
                         ->where('removed_receiver', false)
-                        ->get();
+                        ->orderBy('id', 'desc')->take(50)->get()->reverse();
 
         $messages = MessageResource::collection($messages);
         return $this->success(['messages' => $messages]);
@@ -76,7 +76,7 @@ class MessageController extends Controller {
         if ( !$user->active || !$user->allow_messages ) return $this->failed(['user' => 'access denied']);
         $relation = self::_new_($user->id);
 
-        $data = ['sender_id' => $this->current_id, 'receiver_id' => $user->id, 'content' => $req->content, 'type' => $req->type];
+        $data = ['sender_id' => $this->admin_id, 'receiver_id' => $user->id, 'content' => $req->content, 'type' => $req->type];
         $message = Message::create($data);
         $this->upload_files( [$req->file('file')], 'message', $message->id );
 
@@ -93,10 +93,10 @@ class MessageController extends Controller {
     }
     public function delete ( Request $req, User $user ) {
 
-        Relation::where('sender_id', $this->current_id)->where('receiver_id', $user->id)->where('removed_sender', false)->update(['removed_sender' => true]);
-        Relation::where('receiver_id', $this->current_id)->where('sender_id', $user->id)->where('removed_receiver', false)->update(['removed_receiver' => true]);
-        Message::where('sender_id', $this->current_id)->where('receiver_id', $user->id)->where('removed_sender', false)->update(['removed_sender' => true]);
-        Message::where('receiver_id', $this->current_id)->where('sender_id', $user->id)->where('removed_receiver', false)->update(['removed_receiver' => true]);
+        Relation::where('sender_id', $this->admin_id)->where('receiver_id', $user->id)->where('removed_sender', false)->update(['removed_sender' => true]);
+        Relation::where('receiver_id', $this->admin_id)->where('sender_id', $user->id)->where('removed_receiver', false)->update(['removed_receiver' => true]);
+        Message::where('sender_id', $this->admin_id)->where('receiver_id', $user->id)->where('removed_sender', false)->update(['removed_sender' => true]);
+        Message::where('receiver_id', $this->admin_id)->where('sender_id', $user->id)->where('removed_receiver', false)->update(['removed_receiver' => true]);
         
         event(new ChatBox($this->user()->id, $user->id, 'delete', UserResource::make($user), '', true));
         return $this->success();
@@ -104,8 +104,8 @@ class MessageController extends Controller {
     }
     public function delete_message ( Request $req, Message $message ) {
 
-        if ( $message->sender_id == $this->current_id ) { $message->removed_sender = true; $user = $message->receiver; }
-        if ( $message->receiver_id == $this->current_id ) { $message->removed_receiver = true; $user = $message->sender; }
+        if ( $message->sender_id == $this->admin_id ) { $message->removed_sender = true; $user = $message->receiver; }
+        if ( $message->receiver_id == $this->admin_id ) { $message->removed_receiver = true; $user = $message->sender; }
         $message->save();
 
         event(new ChatBox($this->user()->id, $user->id, 'delete_message', '', $message, true));
@@ -114,39 +114,39 @@ class MessageController extends Controller {
     }
     public function archive ( Request $req, User $user ) {
 
-        Relation::where('sender_id', $this->current_id)->where('receiver_id', $user->id)->where('archived_sender', false)->update(['archived_sender' => true]);
-        Relation::where('receiver_id', $this->current_id)->where('sender_id', $user->id)->where('archived_receiver', false)->update(['archived_receiver' => true]);
+        Relation::where('sender_id', $this->admin_id)->where('receiver_id', $user->id)->where('archived_sender', false)->update(['archived_sender' => true]);
+        Relation::where('receiver_id', $this->admin_id)->where('sender_id', $user->id)->where('archived_receiver', false)->update(['archived_receiver' => true]);
         
-        event(new ChatBox($this->user()->id, $this->current_id, 'archive', UserResource::make($user)));
+        event(new ChatBox($this->user()->id, $this->admin_id, 'archive', UserResource::make($user)));
         return $this->success();
 
     }
     public function unarchive ( Request $req, User $user ) {
 
-        Relation::where('sender_id', $this->current_id)->where('receiver_id', $user->id)->where('archived_sender', true)->update(['archived_sender' => false]);
-        Relation::where('receiver_id', $this->current_id)->where('sender_id', $user->id)->where('archived_receiver', true)->update(['archived_receiver' => false]);
+        Relation::where('sender_id', $this->admin_id)->where('receiver_id', $user->id)->where('archived_sender', true)->update(['archived_sender' => false]);
+        Relation::where('receiver_id', $this->admin_id)->where('sender_id', $user->id)->where('archived_receiver', true)->update(['archived_receiver' => false]);
         
-        event(new ChatBox($this->user()->id, $this->current_id, 'unarchive', UserResource::make($user)));
+        event(new ChatBox($this->user()->id, $this->admin_id, 'unarchive', UserResource::make($user)));
         return $this->success();
 
     }
     public function star_message ( Request $req, Message $message ) {
 
-        if ( $message->sender_id == $this->current_id ) $message->star_sender = true;
-        if ( $message->receiver_id == $this->current_id ) $message->star_receiver = true;
+        if ( $message->sender_id == $this->admin_id ) $message->star_sender = true;
+        if ( $message->receiver_id == $this->admin_id ) $message->star_receiver = true;
         $message->save();
 
-        event(new ChatBox($this->user()->id, $this->current_id, 'star', '', $message));
+        event(new ChatBox($this->user()->id, $this->admin_id, 'star', '', $message));
         return $this->success();
 
     }
     public function unstar_message ( Request $req, Message $message ) {
 
-        if ( $message->sender_id == $this->current_id ) $message->star_sender = false;
-        if ( $message->receiver_id == $this->current_id ) $message->star_receiver = false;
+        if ( $message->sender_id == $this->admin_id ) $message->star_sender = false;
+        if ( $message->receiver_id == $this->admin_id ) $message->star_receiver = false;
         $message->save();
 
-        event(new ChatBox($this->user()->id, $this->current_id, 'unstar', '', $message));
+        event(new ChatBox($this->user()->id, $this->admin_id, 'unstar', '', $message));
         return $this->success();
 
     }

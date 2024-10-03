@@ -311,3 +311,75 @@ Route::prefix('admin')->group(function(){
     });
 
 });
+Route::prefix('client')->group(function(){
+
+    Route::prefix('auth')->group(function(){
+
+        Route::post('register', 'App\Http\Controllers\Client\AuthController@register');
+        Route::post('login', 'App\Http\Controllers\Client\AuthController@login');
+        Route::post('recovery', 'App\Http\Controllers\Client\AuthController@recovery');
+        Route::post('check-token/{token}', 'App\Http\Controllers\Client\AuthController@check');
+        Route::post('change-password/{token}', 'App\Http\Controllers\Client\AuthController@change');
+
+        Route::middleware(['auth:sanctum', 'client'])->group(function(){
+            Route::post('logout', 'App\Http\Controllers\Client\AuthController@logout');
+        });
+
+    });
+    Route::middleware(['auth:sanctum', 'client'])->group(function(){
+        
+        Route::prefix('account')->group(function(){
+            Route::post('', 'App\Http\Controllers\Client\AccountController@index');
+            Route::post('save', 'App\Http\Controllers\Client\AccountController@save');
+            Route::post('password', 'App\Http\Controllers\Client\AccountController@password');
+        });
+        Route::prefix('home')->group(function(){
+            Route::post('', 'App\Http\Controllers\Client\HomeController@index');
+            Route::post('contact', 'App\Http\Controllers\Client\HomeController@contact');
+            Route::post('categories', 'App\Http\Controllers\Client\HomeController@categories');
+            Route::post('categories/{category}', 'App\Http\Controllers\Client\HomeController@products');
+        });
+        Route::prefix('search')->group(function(){
+            Route::post('', 'App\Http\Controllers\Client\SearchController@index');
+            Route::post('form', 'App\Http\Controllers\Client\SearchController@form');
+        });
+        Route::prefix('vendor/{user}')->group(function(){
+            Route::post('', 'App\Http\Controllers\Client\VendorController@index');
+            Route::post('products', 'App\Http\Controllers\Client\VendorController@products');
+            Route::post('reviews', 'App\Http\Controllers\Client\VendorController@reviews');
+        });
+        Route::prefix('product/{product}')->group(function(){
+            Route::post('', 'App\Http\Controllers\Client\ProductController@index');
+            Route::post('reviews', 'App\Http\Controllers\Client\ProductController@reviews');
+        });
+        Route::middleware('messages')->group(function(){
+
+            Route::prefix('chat')->group(function(){
+                Route::post('', 'App\Http\Controllers\Client\ChatController@index');
+                Route::post('active', 'App\Http\Controllers\Client\ChatController@active');
+                Route::post('send', 'App\Http\Controllers\Client\ChatController@send');
+            });
+            Route::prefix('message/{user}/{product}')->group(function(){
+                Route::post('', 'App\Http\Controllers\Client\MessageController@index');
+                Route::post('send', 'App\Http\Controllers\Client\MessageController@send');
+            });
+
+        });
+        Route::middleware('orders')->group(function(){
+
+            Route::prefix('order/{product}')->group(function(){
+
+                Route::post('', 'App\Http\Controllers\Client\OrderController@index');
+                Route::post('coupon', 'App\Http\Controllers\Client\OrderController@coupon');
+                Route::post('checkout', 'App\Http\Controllers\Client\OrderController@checkout');
+
+            });
+
+        });
+
+    });
+
+});
+
+// account bookings
+// rating and review book

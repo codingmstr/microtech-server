@@ -58,7 +58,7 @@ class OrderController extends Controller {
 
         $product = Product::where('id', $req->product_id)->where('allow_orders', true)->where('active', true)->first();
         $client = User::where('role', 3)->where('id', $req->client_id)->where('active', true)->where('allow_orders', true)->first();
-        $coupon = Coupon::where('id', $req->coupon_id)->where('active', true)->first();
+        $coupon = Coupon::where('id', $req->coupon_id)->where('active', true)->where('allow_orders', true)->first();
 
         if ( !$client ) return $this->failed(['client' => 'not exists']);
         if ( !$product ) return $this->failed(['product' => 'not exists']);

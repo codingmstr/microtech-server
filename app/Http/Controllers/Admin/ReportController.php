@@ -15,12 +15,14 @@ class ReportController extends Controller {
 
         $data = $this->paginate( Report::query(), $req );
         $items = ReportResource::collection( $data['items'] );
+      
         $tags = [
             'total' => $data['total'],
             'products' => Product::query()->count(),
             'orders' => Order::query()->count(),
             'users' => User::where('role', '!=', '1')->count(),
         ];
+        
         return $this->success(['items' => $items, 'total'=> $data['total'], 'tags' => $tags]);
 
     }

@@ -14,13 +14,7 @@ class ContactController extends Controller {
 
         $data = $this->paginate( Contact::query(), $req );
         $items = ContactResource::collection( $data['items'] );
-        $tags = [
-            'total' => $data['total'],
-            'vendors' => User::where('role', '2')->count(),
-            'clients' => User::where('role', '1')->count(),
-            'reviews' => Review::query()->count(),
-        ];
-        return $this->success(['items' => $items, 'total'=> $data['total'], 'tags' => $tags]);
+        return $this->success(['items' => $items, 'total'=> $data['total']]);
 
     }
     public function show ( Request $req, Contact $contact ) {

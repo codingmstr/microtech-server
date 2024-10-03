@@ -16,19 +16,19 @@ class Product extends Model {
         'name',
         'company',
         'phone',
+        'type',
         'language',
         'country',
         'city',
         'street',
         'location',
+        'longitude',
+        'latitude',
         'old_price',
         'new_price',
         'description',
         'details',
-        'availability',
         'policy',
-        'rules',
-        'safety',
         'includes',
         'notes',
         'rate',
@@ -69,6 +69,11 @@ class Product extends Model {
     public function coupons () {
 
         return $this->hasMany(Coupon::class);
+
+    }
+    public function messages () {
+
+        return $this->hasMany(Message::class);
 
     }
 

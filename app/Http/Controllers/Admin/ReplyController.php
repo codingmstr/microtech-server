@@ -38,13 +38,7 @@ class ReplyController extends Controller {
 
         $data = $this->paginate( Reply::query(), $req );
         $items = ReplyResource::collection( $data['items'] );
-        $tags = [
-            'total' => $data['total'],
-            'blogs' => Blog::query()->count(),
-            'comments' => Comment::query()->count(),
-            'reviews' => Review::query()->count(),
-        ];
-        return $this->success(['items' => $items, 'total'=> $data['total'], 'tags' => $tags]);
+        return $this->success(['items' => $items, 'total'=> $data['total']]);
 
     }
     public function show ( Request $req, Reply $reply ) {

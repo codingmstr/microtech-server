@@ -9,6 +9,10 @@ use App\Models\Report;
 use App\Events\Notify;
 use App\Models\File;
 use DateTime;
+use Vonage\Client;
+use Vonage\Client\Credentials\Basic;
+use Vonage\SMS\Message\SMS;
+use GuzzleHttp\Client as ApiClient;
 
 abstract class Controller {
 
@@ -171,6 +175,8 @@ abstract class Controller {
             'city' => $this->string($req->city),
             'street' => $this->string($req->street),
             'location' => $this->string($req->location),
+            'longitude' => $this->string($req->longitude),
+            'latitude' => $this->string($req->latitude),
             'currency' => $this->string($req->currency),
             'notes' => $this->string($req->notes),
             'allow_categories' => $this->bool($req->allow_categories),
@@ -314,6 +320,39 @@ abstract class Controller {
         ];
 
         return $data;
+
+    }
+    public function send_sms ( $phone, $message ) {
+
+        $api_key = "7019ef4b";
+        $sec_key = "q8SVI6913VMfCyR5";
+        $company = "Microtech";
+        $basic  = new Basic($api_key, $sec_key);
+        $client = new Client($basic);
+        $response = $client->sms()->send(new SMS($phone, $company, $message));
+
+        return true;
+
+    }
+    public function send_whatsapp ( $phone, $message ) {
+
+        $instance_id = "instance89613";
+        $api_token = "a600sm5p56zzpfaw";
+        $client = new ApiClient();
+
+        $response = $client->post("https://api.ultramsg.com/{$instance_id}/messages/chat", [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Authorization' => "Bearer {$api_token}",
+            ],
+            'json' => [
+                'token' => $api_token,
+                'to' => $phone,
+                'body' => $message,
+            ]
+        ]);
+
+        return true;
 
     }
 

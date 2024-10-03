@@ -12,6 +12,7 @@ return new class extends Migration {
             $table->id();
             $table->integer('sender_id')->default(0);
             $table->integer('receiver_id')->default(0);
+            $table->integer('product_id')->default(0);
             $table->enum('type', ['text', 'file']);
             $table->longText('content')->nullable();
             $table->boolean('removed_sender')->default(false);

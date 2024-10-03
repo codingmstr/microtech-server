@@ -44,12 +44,14 @@ class ProductController extends Controller {
 
         $data = $this->paginate( Product::query(), $req );
         $items = ProductResource::collection( $data['items'] );
+
         $tags = [
             'total' => $data['total'],
             'orders' => Order::query()->count(),
             'reviews' => Review::query()->count(),
             'coupons' => Coupon::query()->count(),
         ];
+        
         return $this->success(['items' => $items, 'total'=> $data['total'], 'tags' => $tags]);
 
     }
@@ -69,19 +71,19 @@ class ProductController extends Controller {
             'name' => $this->string($req->name),
             'company' => $this->string($req->company),
             'phone' => $this->string($req->phone),
+            'type' => $this->string($req->type),
             'language' => $this->string($req->language),
             'country' => $this->string($req->country),
             'city' => $this->string($req->city),
             'street' => $this->string($req->street),
             'location' => $this->string($req->location),
+            'longitude' => $this->string($req->longitude),
+            'latitude' => $this->string($req->latitude),
             'old_price' => $this->float($req->old_price),
             'new_price' => $this->float($req->new_price),
             'description' => $this->string($req->description),
             'details' => $this->string($req->details),
-            'availability' => $this->string($req->availability),
             'policy' => $this->string($req->policy),
-            'rules' => $this->string($req->rules),
-            'safety' => $this->string($req->safety),
             'notes' => $this->string($req->notes),
             'includes' => $req->includes,
             'rate' => $this->float($req->rate),
@@ -105,19 +107,19 @@ class ProductController extends Controller {
             'name' => $this->string($req->name),
             'company' => $this->string($req->company),
             'phone' => $this->string($req->phone),
+            'type' => $this->string($req->type),
             'language' => $this->string($req->language),
             'country' => $this->string($req->country),
             'city' => $this->string($req->city),
             'street' => $this->string($req->street),
             'location' => $this->string($req->location),
+            'longitude' => $this->string($req->longitude),
+            'latitude' => $this->string($req->latitude),
             'old_price' => $this->float($req->old_price),
             'new_price' => $this->float($req->new_price),
             'description' => $this->string($req->description),
             'details' => $this->string($req->details),
-            'availability' => $this->string($req->availability),
             'policy' => $this->string($req->policy),
-            'rules' => $this->string($req->rules),
-            'safety' => $this->string($req->safety),
             'notes' => $this->string($req->notes),
             'includes' => $req->includes,
             'rate' => $this->float($req->rate),

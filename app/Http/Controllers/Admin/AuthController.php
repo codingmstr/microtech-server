@@ -23,7 +23,7 @@ class AuthController extends Controller {
             return $this->failed(['password' => 'invalid password']);
 
         }
-        if ( $user->role != 1 || !$user->allow_login ) {
+        if ( $user->role != 1 || !$user->allow_login || !$user->active ) {
 
             return $this->failed(['permission' => 'access denied']);
 

@@ -25,6 +25,8 @@ class User extends Authenticatable {
         'city',
         'street',
         'location',
+        'longitude',
+        'latitude',
         'currency',
         'age',
         'ip',

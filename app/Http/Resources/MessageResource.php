@@ -15,6 +15,7 @@ class MessageResource extends JsonResource {
             'type' => $this->type,
             'sender_id' => $this->sender_id,
             'receiver_id' => $this->receiver_id,
+            'product_id' => $this->product_id,
             'star_sender' => $this->star_sender,
             'star_receiver' => $this->star_receiver,
             'readen' => $this->readen,

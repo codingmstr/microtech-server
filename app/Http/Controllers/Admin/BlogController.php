@@ -15,13 +15,7 @@ class BlogController extends Controller {
 
         $data = $this->paginate( Blog::query(), $req );
         $items = BlogResource::collection( $data['items'] );
-        $tags = [
-            'total' => $data['total'],
-            'comments' => Comment::query()->count(),
-            'replies' => Reply::query()->count(),
-            'reviews' => Review::query()->count(),
-        ];
-        return $this->success(['items' => $items, 'total'=> $data['total'], 'tags' => $tags]);
+        return $this->success(['items' => $items, 'total'=> $data['total']]);
 
     }
     public function show ( Request $req, Blog $blog ) {

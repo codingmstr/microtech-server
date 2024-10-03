@@ -42,13 +42,7 @@ class CouponController extends Controller {
 
         $data = $this->paginate( Coupon::query(), $req );
         $items = CouponResource::collection( $data['items'] );
-        $tags = [
-            'total' => $data['total'],
-            'orders' => Order::query()->count(),
-            'vendors' => User::where('role', '2')->count(),
-            'clients' => User::where('role', '1')->count(),
-        ];
-        return $this->success(['items' => $items, 'total'=> $data['total'], 'tags' => $tags]);
+        return $this->success(['items' => $items, 'total'=> $data['total']]);
 
     }
     public function show ( Request $req, Coupon $coupon ) {
