@@ -27,6 +27,7 @@ class OrderResource extends JsonResource {
             'secret_key' => $this->secret_key,
             'paid' => $this->paid,
             'status' => $this->status,
+            'deleted' => $this->deleted,
             'active' => $this->active,
             'paid_at' => $this->paid_at?->format('Y-m-d H:i:s'),
             'confirmed_at' => $this->confirmed_at?->format('Y-m-d H:i:s'),

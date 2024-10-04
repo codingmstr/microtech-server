@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->integer('likes')->default(0);
             $table->integer('dislikes')->default(0);
             $table->boolean('allow_replies')->default(true);
+            $table->boolean('allow')->default(true);
             $table->boolean('active')->default(true);
             $table->timestamps();
             $table->softDeletes();

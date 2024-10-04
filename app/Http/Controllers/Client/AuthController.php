@@ -28,6 +28,8 @@ class AuthController extends Controller {
             'ip' => $req->ip(),
             'agent' => $req->userAgent(),
             'login_at' => $this->date(),
+            'longitude' => $this->string($req->longitude),
+            'latitude' => $this->string($req->latitude),
         ];
 
         $user = User::create($data);

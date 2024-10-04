@@ -18,6 +18,7 @@ class Reply extends Model {
         'content',
         'likes',
         'dislikes',
+        'allow',
         'active',
     ];
 

@@ -14,6 +14,7 @@ class CommentResource extends JsonResource {
             'likes' => $this->likes,
             'dislikes' => $this->dislikes,
             'allow_replies' => $this->allow_replies,
+            'allow' => $this->allow,
             'active' => $this->active,
             'replies' => count($this->replies),
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),

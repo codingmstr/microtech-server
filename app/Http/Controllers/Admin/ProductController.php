@@ -64,6 +64,8 @@ class ProductController extends Controller {
     }
     public function store ( Request $req ) {
 
+        $location = $this->get_location("{$req->street}, {$req->city}, {$req->country}");
+
         $data = [
             'admin_id' => $this->user()->id,
             'vendor_id' => $this->integer($req->vendor_id),
@@ -76,9 +78,9 @@ class ProductController extends Controller {
             'country' => $this->string($req->country),
             'city' => $this->string($req->city),
             'street' => $this->string($req->street),
-            'location' => $this->string($req->location),
-            'longitude' => $this->string($req->longitude),
-            'latitude' => $this->string($req->latitude),
+            'location' => "{$req->street}, {$req->city}, {$req->country}",
+            'longitude' => $location['longitude'],
+            'latitude' => $location['latitude'],
             'old_price' => $this->float($req->old_price),
             'new_price' => $this->float($req->new_price),
             'description' => $this->string($req->description),
@@ -90,6 +92,7 @@ class ProductController extends Controller {
             'allow_reviews' => $this->bool($req->allow_reviews),
             'allow_coupons' => $this->bool($req->allow_coupons),
             'allow_orders' => $this->bool($req->allow_orders),
+            'allow' => $this->bool($req->allow),
             'active' => $this->bool($req->active),
         ];
 
@@ -100,6 +103,8 @@ class ProductController extends Controller {
 
     }
     public function update ( Request $req, Product $product ) {
+
+        $location = $this->get_location("{$req->street}, {$req->city}, {$req->country}");
 
         $data = [
             'category_id' => $this->integer($req->category_id),
@@ -112,9 +117,9 @@ class ProductController extends Controller {
             'country' => $this->string($req->country),
             'city' => $this->string($req->city),
             'street' => $this->string($req->street),
-            'location' => $this->string($req->location),
-            'longitude' => $this->string($req->longitude),
-            'latitude' => $this->string($req->latitude),
+            'location' => "{$req->street}, {$req->city}, {$req->country}",
+            'longitude' => $location['longitude'],
+            'latitude' => $location['latitude'],
             'old_price' => $this->float($req->old_price),
             'new_price' => $this->float($req->new_price),
             'description' => $this->string($req->description),
@@ -126,6 +131,7 @@ class ProductController extends Controller {
             'allow_reviews' => $this->bool($req->allow_reviews),
             'allow_coupons' => $this->bool($req->allow_coupons),
             'allow_orders' => $this->bool($req->allow_orders),
+            'allow' => $this->bool($req->allow),
             'active' => $this->bool($req->active),
         ];
 

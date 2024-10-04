@@ -17,6 +17,7 @@ class Review extends Model {
         'order_id',
         'content',
         'rate',
+        'allow',
         'active',
     ];
 

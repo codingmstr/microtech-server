@@ -17,13 +17,15 @@ class HomeController extends Controller {
     public function based_location () {
 
         $products = Product::where('active', true)
-            ->where('country', $this->user()->country)
-            ->where('city', $this->user()->city)
+            ->where('allow', true)
+            ->where('country', $this->user()?->country)
+            ->where('city', $this->user()?->city)
             ->latest()->take(20)
             ->get();
 
         $by_country = Product::where('active', true)
-            ->where('country', $this->user()->country)
+            ->where('allow', true)
+            ->where('country', $this->user()?->country)
             ->latest()->take(20)
             ->get();
 
@@ -33,18 +35,18 @@ class HomeController extends Controller {
             ->take(20);
 
         if ( $products->count() < 20 ) {
-            $recently = Product::where('active', true)->latest()->take(20)->get();
+            $recently = Product::where('active', true)->where('allow', true)->latest()->take(20)->get();
             $products = $products->merge($recently)->unique('id')->values()->take(20);
         }
 
         return ProductResource::collection( $products );
 
     }
-    public function near_by () {
+    public function near_by ( $req ) {
 
         $radius = 10; // 10 km
-        $lng = $this->user()->longitude;
-        $lat = $this->user()->latitude;
+        $lng = $this->string($req->longitude) ?? $this->user()?->longitude;
+        $lat = $this->string($req->latitude) ?? $this->user()?->latitude;
 
         $products = DB::table('products')
             ->selectRaw("*, ( 6371 * acos( cos( radians(?) ) *
@@ -54,10 +56,12 @@ class HomeController extends Controller {
                     sin( radians( latitude ) ) ) ) AS distance", [$lat, $lng, $lat])
             ->having('distance', '<', $radius)
             ->orderBy('distance')
+            ->where('active', true)
+            ->where('allow', true)
             ->take(20)->get();
 
         if ( $products->count() < 20 ) {
-            $recently = Product::where('active', true)->latest()->take(20)->get();
+            $recently = Product::where('active', true)->where('allow', true)->latest()->take(20)->get();
             $products = $products->merge($recently)->unique('id')->values()->take(20);
         }
 
@@ -66,7 +70,7 @@ class HomeController extends Controller {
     }
     public function recommended () {
 
-        $history = Order::where('client_id', $this->user()->id)
+        $history = Order::where('client_id', $this->user()?->id)
             ->latest()
             ->take(20)
             ->pluck('id')
@@ -74,20 +78,21 @@ class HomeController extends Controller {
 
         $viewed = Report::where('table', 'product')
             ->where('process', 'view')
-            ->where('client_id', $this->user()->id)
+            ->where('client_id', $this->user()?->id)
             ->latest()
             ->take(20)
             ->pluck('column')
             ->toArray();
 
         $popular = Product::where('active', true)
+            ->where('allow', true)
             ->orderBy('views', 'desc')
             ->take(20)
             ->pluck('id')
             ->toArray();
 
         $productIds = array_unique(array_merge($history, $viewed, $popular));
-        $products = Product::where('active', true)->whereIn('id', $productIds)->get();
+        $products = Product::where('active', true)->where('allow', true)->whereIn('id', $productIds)->get();
 
         $products = $products->sortBy(function ($product) use ($history, $viewed, $popular) {
             if ( in_array($product->id, $history) ) return 1;
@@ -97,7 +102,7 @@ class HomeController extends Controller {
         })->values()->take(20);
 
         if ( $products->count() < 20 ) {
-            $recently = Product::where('active', true)->latest()->take(20)->get();
+            $recently = Product::where('active', true)->where('allow', true)->latest()->take(20)->get();
             $products = $products->merge($recently)->unique('id')->values()->take(20);
         }
 
@@ -106,7 +111,7 @@ class HomeController extends Controller {
     }
     public function recently () {
 
-        $products = Product::where('active', true)->latest()->take(20)->get();
+        $products = Product::where('active', true)->where('allow', true)->latest()->take(20)->get();
         return ProductResource::collection( $products );
 
     }
@@ -124,7 +129,7 @@ class HomeController extends Controller {
             'recently' => self::recently(),
             'recommended' => self::recommended(),
             'based_location' => self::based_location(),
-            'near_by' => self::near_by(),
+            'near_by' => self::near_by($req),
         ];
 
         return $this->success($data);
@@ -142,7 +147,9 @@ class HomeController extends Controller {
     }
     public function products ( Request $req, Category $category ) {
 
-        $items = Product::where('active', true)->where('category_id', $category->id)->latest()->get();
+        if ( !$category->active ) return $this->failed();
+
+        $items = Product::where('category_id', $category->id)->where('active', true)->where('allow', true)->latest()->get();
         $items = ProductResource::collection( $items );
 
         $data = [
@@ -167,7 +174,7 @@ class HomeController extends Controller {
             'country' => $this->string($req->country),
             'city' => $this->string($req->city),
             'street' => $this->string($req->street),
-            'location' => $this->string($req->location),
+            'location' => $this->string($req->longitude) . ', ' . $this->string($req->latitude),
             'content' => $this->string($req->content),
             'active' => true,
             'ip' => $req->ip(),

@@ -54,6 +54,7 @@ class CommentController extends Controller {
             'blog_id' => $this->integer($req->blog_id),
             'content' => $this->string($req->content),
             'allow_replies' => $this->bool($req->allow_replies),
+            'allow' => $this->bool($req->allow),
             'active' => $this->bool($req->active),
         ];
 
@@ -67,6 +68,7 @@ class CommentController extends Controller {
         $data = [
             'content' => $this->string($req->content),
             'allow_replies' => $this->bool($req->allow_replies),
+            'allow' => $this->bool($req->allow),
             'active' => $this->bool($req->active),
         ];
 

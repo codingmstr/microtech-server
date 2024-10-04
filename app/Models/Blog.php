@@ -31,6 +31,7 @@ class Blog extends Model {
         'allow_replies',
         'allow_likes',
         'allow_dislikes',
+        'allow',
         'active',
     ];
 

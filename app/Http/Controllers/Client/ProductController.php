@@ -14,7 +14,7 @@ class ProductController extends Controller {
 
     public function recommended () {
 
-        $history = Order::where('client_id', $this->user()->id)
+        $history = Order::where('client_id', $this->user()?->id)
             ->latest()
             ->take(20)
             ->pluck('id')
@@ -22,7 +22,7 @@ class ProductController extends Controller {
 
         $viewed = Report::where('table', 'product')
             ->where('process', 'view')
-            ->where('client_id', $this->user()->id)
+            ->where('client_id', $this->user()?->id)
             ->latest()
             ->take(20)
             ->pluck('column')
@@ -54,7 +54,7 @@ class ProductController extends Controller {
     }
     public function index ( Request $req, Product $product ) {
 
-        if ( !$product->active ) return $this->failed();
+        if ( !$product->active || !$product->allow ) return $this->failed();
         $product = ProductResource::make( $product );
 
         $product->update(['views' => $product->views+1]);
@@ -66,7 +66,8 @@ class ProductController extends Controller {
     }
     public function reviews ( Request $req, Product $product ) {
 
-        $data = $this->paginate( Review::where('product_id', $product->id), $req );
+        $reviews = Review::where('product_id', $product->id)->where('active', true)->where('allow', true);
+        $data = $this->paginate( $reviews, $req );
         $items = ReviewResource::collection( $data['items'] );
         return $this->success(['items' => $items, 'total'=> $data['total']]);
 

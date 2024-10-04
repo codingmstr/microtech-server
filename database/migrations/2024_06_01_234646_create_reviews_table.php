@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->integer('order_id')->default(0);
             $table->longText('content')->nullable();
             $table->float('rate')->default(0);
+            $table->boolean('allow')->default(true);
             $table->boolean('active')->default(true);
             $table->timestamps();
             $table->softDeletes();

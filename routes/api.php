@@ -329,28 +329,25 @@ Route::prefix('client')->group(function(){
     Route::middleware(['auth:sanctum', 'client'])->group(function(){
         
         Route::prefix('account')->group(function(){
+
             Route::post('', 'App\Http\Controllers\Client\AccountController@index');
             Route::post('save', 'App\Http\Controllers\Client\AccountController@save');
             Route::post('password', 'App\Http\Controllers\Client\AccountController@password');
-        });
-        Route::prefix('home')->group(function(){
-            Route::post('', 'App\Http\Controllers\Client\HomeController@index');
-            Route::post('contact', 'App\Http\Controllers\Client\HomeController@contact');
-            Route::post('categories', 'App\Http\Controllers\Client\HomeController@categories');
-            Route::post('categories/{category}', 'App\Http\Controllers\Client\HomeController@products');
-        });
-        Route::prefix('search')->group(function(){
-            Route::post('', 'App\Http\Controllers\Client\SearchController@index');
-            Route::post('form', 'App\Http\Controllers\Client\SearchController@form');
-        });
-        Route::prefix('vendor/{user}')->group(function(){
-            Route::post('', 'App\Http\Controllers\Client\VendorController@index');
-            Route::post('products', 'App\Http\Controllers\Client\VendorController@products');
-            Route::post('reviews', 'App\Http\Controllers\Client\VendorController@reviews');
-        });
-        Route::prefix('product/{product}')->group(function(){
-            Route::post('', 'App\Http\Controllers\Client\ProductController@index');
-            Route::post('reviews', 'App\Http\Controllers\Client\ProductController@reviews');
+
+            Route::prefix('history')->group(function(){
+                
+                Route::post('', 'App\Http\Controllers\Client\HistoryController@index');
+                Route::post('delete', 'App\Http\Controllers\Client\HistoryController@delete_group');
+
+                Route::prefix('{order}')->group(function(){
+                    Route::post('', 'App\Http\Controllers\Client\HistoryController@show');
+                    Route::post('update', 'App\Http\Controllers\Client\HistoryController@update');
+                    Route::post('delete', 'App\Http\Controllers\Client\HistoryController@delete');
+                    Route::post('review', 'App\Http\Controllers\Client\HistoryController@review');
+                });
+
+            });
+
         });
         Route::middleware('messages')->group(function(){
 
@@ -368,18 +365,37 @@ Route::prefix('client')->group(function(){
         Route::middleware('orders')->group(function(){
 
             Route::prefix('order/{product}')->group(function(){
-
-                Route::post('', 'App\Http\Controllers\Client\OrderController@index');
-                Route::post('coupon', 'App\Http\Controllers\Client\OrderController@coupon');
                 Route::post('checkout', 'App\Http\Controllers\Client\OrderController@checkout');
-
             });
 
         });
 
     });
+    Route::prefix('home')->group(function(){
+        Route::post('', 'App\Http\Controllers\Client\HomeController@index');
+        Route::post('contact', 'App\Http\Controllers\Client\HomeController@contact');
+        Route::post('categories', 'App\Http\Controllers\Client\HomeController@categories');
+        Route::post('categories/{category}', 'App\Http\Controllers\Client\HomeController@products');
+    });
+    Route::prefix('search')->group(function(){
+        Route::post('', 'App\Http\Controllers\Client\SearchController@index');
+        Route::post('form', 'App\Http\Controllers\Client\SearchController@form');
+    });
+    Route::prefix('vendor/{user}')->group(function(){
+        Route::post('', 'App\Http\Controllers\Client\VendorController@index');
+        Route::post('products', 'App\Http\Controllers\Client\VendorController@products');
+        Route::post('reviews', 'App\Http\Controllers\Client\VendorController@reviews');
+    });
+    Route::prefix('product/{product}')->group(function(){
+        Route::post('', 'App\Http\Controllers\Client\ProductController@index');
+        Route::post('reviews', 'App\Http\Controllers\Client\ProductController@reviews');
+    });
+    Route::prefix('order/{product}')->group(function(){
+        Route::post('', 'App\Http\Controllers\Client\OrderController@index');
+        Route::post('coupon', 'App\Http\Controllers\Client\OrderController@coupon');
+    });
 
 });
 
-// account bookings
-// rating and review book
+// user ( postal field )
+// bookings histofy

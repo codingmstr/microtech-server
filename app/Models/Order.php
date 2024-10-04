@@ -37,6 +37,7 @@ class Order extends Model {
         'confirmed_at',
         'cancelled_at',
         'ordered_at',
+        'deleted',
     ];
     protected $casts = [
         'paid_at' => 'datetime',

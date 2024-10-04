@@ -35,6 +35,7 @@ class Product extends Model {
         'allow_reviews',
         'allow_orders',
         'allow_coupons',
+        'allow',
         'active',
     ];
     protected $casts = [

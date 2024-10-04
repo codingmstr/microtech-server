@@ -32,6 +32,7 @@ return new class extends Migration {
             $table->string('coupon_code')->nullable();
             $table->boolean('paid')->default(false);
             $table->enum('status', ['pending', 'request', 'confirmed', 'cancelled']);
+            $table->boolean('deleted')->default(false);
             $table->boolean('active')->default(true);
             $table->timestamp('paid_at')->nullable();
             $table->timestamp('confirmed_at')->nullable();

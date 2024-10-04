@@ -53,6 +53,7 @@ class ReviewController extends Controller {
             'product_id' => $this->integer($req->product_id),
             'content' => $this->string($req->content),
             'rate' => $this->float($req->rate),
+            'allow' => $this->bool($req->allow),
             'active' => $this->bool($req->active),
         ];
 
@@ -66,6 +67,7 @@ class ReviewController extends Controller {
         $data = [
             'content' => $this->string($req->content),
             'rate' => $this->float($req->rate),
+            'allow' => $this->bool($req->allow),
             'active' => $this->bool($req->active),
         ];
 

@@ -65,6 +65,7 @@ class CouponController extends Controller {
             'discount' => $this->float($req->discount),
             'notes' => $this->string($req->notes),
             'allow_orders' => $this->bool($req->allow_orders),
+            'allow' => $this->bool($req->allow),
             'active' => $this->bool($req->active),
         ];
 
@@ -86,6 +87,7 @@ class CouponController extends Controller {
             'discount' => $this->float($req->discount),
             'notes' => $this->string($req->notes),
             'allow_orders' => $this->bool($req->allow_orders),
+            'allow' => $this->bool($req->allow),
             'active' => $this->bool($req->active),
         ];
 

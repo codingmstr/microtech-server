@@ -13,6 +13,7 @@ class CouponResource extends JsonResource {
             'name' => $this->name,
             'discount' => $this->discount,
             'notes' => $this->notes,
+            'allow' => $this->allow,
             'active' => $this->active,
             'allow_orders' => $this->allow_orders,
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),

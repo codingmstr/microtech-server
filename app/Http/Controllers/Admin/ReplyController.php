@@ -59,6 +59,7 @@ class ReplyController extends Controller {
             'comment_id' => $this->integer($req->comment_id),
             'blog_id' => Comment::find($req->comment_id)->blog->id,
             'content' => $this->string($req->content),
+            'allow' => $this->bool($req->allow),
             'active' => $this->bool($req->active),
         ];
 
@@ -71,6 +72,7 @@ class ReplyController extends Controller {
 
         $data = [
             'content' => $this->string($req->content),
+            'allow' => $this->bool($req->allow),
             'active' => $this->bool($req->active),
         ];
 

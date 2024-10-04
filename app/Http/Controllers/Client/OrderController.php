@@ -10,17 +10,17 @@ use App\Models\Coupon;
 
 class OrderController extends Controller {
 
-    public function discount ( $product, $coupon ) {
+    public function discount ( $product, $coupon, $readOnly=false ) {
         
         if ( !$coupon ) return false;
-        if ( !$this->user()->allow_coupons ) return false;
         if ( !$product->allow_coupons ) return false;
         if ( $product->category && !$product->category?->allow_coupons ) return false;
         if ( $product->vendor && !$product->vendor?->allow_coupons ) return false;
         if ( $coupon->product_id && $coupon->product_id !== $product->id ) return false;
         if ( $coupon->category_id && $coupon->category_id !== $product->category_id ) return false;
         if ( $coupon->vendor_id && $coupon->vendor_id !== $product->vendor_id ) return false;
-        if ( $coupon->client_id && $coupon->client_id !== $this->user()->id ) return false;
+        if ( !$readOnly && !$this->user()->allow_coupons ) return false;
+        if ( !$readOnly && $coupon->client_id && $coupon->client_id !== $this->user()->id ) return false;
 
         return $product->new_price - ( $product->new_price * $coupon->discount / 100 );
 
@@ -35,7 +35,7 @@ class OrderController extends Controller {
     public function coupon ( Request $req, Product $product ) {
 
         $coupon = Coupon::where('name', $req->coupon)->where('active', true)->where('allow_orders', true)->first();
-        $price = self::discount( $product, $coupon );
+        $price = self::discount( $product, $coupon, true );
         if ( !$price ) return $this->failed();
         return $this->success(['price' => $price, 'discount' => $coupon->discount]);
 

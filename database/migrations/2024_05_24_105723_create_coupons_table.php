@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->string('notes')->nullable();
             $table->float('discount')->default(0);
             $table->boolean('allow_orders')->default(true);
+            $table->boolean('allow')->default(true);
             $table->boolean('active')->default(true);
             $table->timestamps();
             $table->softDeletes();

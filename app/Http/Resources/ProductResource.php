@@ -38,6 +38,7 @@ class ProductResource extends JsonResource {
             'allow_coupons' => $this->allow_coupons,
             'allow_orders' => $this->allow_orders,
             'allow_reviews' => $this->allow_reviews,
+            'allow' => $this->allow,
             'active' => $this->active,
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),

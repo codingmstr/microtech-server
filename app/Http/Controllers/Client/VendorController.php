@@ -20,18 +20,20 @@ class VendorController extends Controller {
     }
     public function products ( Request $req, User $user ) {
 
-        $data = $this->paginate( Product::where('active', true)->where('vendor_id', $user->id), $req );
+        $products = Product::where('vendor_id', $user->id)->where('active', true)->where('allow', true);
+        $data = $this->paginate( $products, $req );
         $items = ProductResource::collection( $data['items'] );
         return $this->success(['items' => $items, 'total'=> $data['total']]);
 
     }
     public function reviews ( Request $req, User $user ) {
 
-        $products = Product::where('vendor_id', $user->id)->pluck('id');
-        $data = $this->paginate( Review::whereIn('product_id', $products), $req );
+        $products = Product::where('vendor_id', $user->id)->where('active', true)->where('allow', true)->pluck('id');
+        $reviews = Review::whereIn('product_id', $products)->where('active', true)->where('allow', true);
+        $data = $this->paginate( $reviews, $req );
         $items = ReviewResource::collection( $data['items'] );
         return $this->success(['items' => $items, 'total'=> $data['total']]);
-   
+
     }
 
 }

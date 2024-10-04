@@ -50,6 +50,7 @@ class BlogController extends Controller {
             'allow_replies' => $this->bool($req->allow_replies),
             'allow_likes' => $this->bool($req->allow_likes),
             'allow_dislikes' => $this->bool($req->allow_dislikes),
+            'allow' => $this->bool($req->allow),
             'active' => $this->bool($req->active),
         ];
 
@@ -84,6 +85,7 @@ class BlogController extends Controller {
             'allow_replies' => $this->bool($req->allow_replies),
             'allow_likes' => $this->bool($req->allow_likes),
             'allow_dislikes' => $this->bool($req->allow_dislikes),
+            'allow' => $this->bool($req->allow),
             'active' => $this->bool($req->active),
         ];
 

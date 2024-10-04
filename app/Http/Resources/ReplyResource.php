@@ -13,6 +13,7 @@ class ReplyResource extends JsonResource {
             'content' => $this->content,
             'likes' => $this->likes,
             'dislikes' => $this->dislikes,
+            'allow' => $this->allow,
             'active' => $this->active,
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),

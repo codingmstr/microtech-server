@@ -18,6 +18,7 @@ class Comment extends Model {
         'likes',
         'dislikes',
         'allow_replies',
+        'allow',
         'active',
     ];
 

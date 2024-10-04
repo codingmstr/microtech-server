@@ -19,6 +19,7 @@ class Coupon extends Model {
         'discount',
         'notes',
         'allow_orders',
+        'allow',
         'active',
     ];
 

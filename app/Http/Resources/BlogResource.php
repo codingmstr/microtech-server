@@ -34,6 +34,7 @@ class BlogResource extends JsonResource {
             'allow_replies' => $this->allow_replies,
             'allow_likes' => $this->allow_likes,
             'allow_dislikes' => $this->allow_dislikes,
+            'allow' => $this->allow,
             'active' => $this->active,
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),

@@ -27,6 +27,7 @@ return new class extends Migration {
             $table->boolean('allow_orders')->default(true);
             $table->boolean('allow_coupons')->default(true);
             $table->boolean('allow_reviews')->default(true);
+            $table->boolean('allow')->default(true);
             $table->boolean('active')->default(true);
             $table->timestamps();
             $table->softDeletes();

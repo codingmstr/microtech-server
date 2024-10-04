@@ -161,7 +161,60 @@ abstract class Controller {
         return date('Y-m-d H:i:s');
 
     }
+    public function get_location ( $address ) {
+
+        $client = new ApiClient();
+
+        try{
+
+            $response = $client->get('https://nominatim.openstreetmap.org/search', [
+                'query' => ['q' => $address, 'format' => 'json', 'limit' => 1, 'accept-language' => 'ar'],
+                'headers' => ['User-Agent' => 'microtech/1.0 (microtech@gmail.com)'],
+            ]);
+            $data = json_decode($response->getBody(), true);
+            if ( !empty($data) ) return ['longitude' => $data[0]['lon'], 'latitude' => $data[0]['lat']];
+
+        } catch (\Exception $e) {}
+
+        return ['longitude' => '46.6753', 'latitude' => '24.7136'];
+
+    }
+    public function send_sms ( $phone, $message ) {
+
+        $api_key = "7019ef4b";
+        $sec_key = "q8SVI6913VMfCyR5";
+        $company = "Microtech";
+        $basic  = new Basic($api_key, $sec_key);
+        $client = new Client($basic);
+        $response = $client->sms()->send(new SMS($phone, $company, $message));
+
+        return true;
+
+    }
+    public function send_whatsapp ( $phone, $message ) {
+
+        $instance_id = "instance89613";
+        $api_token = "a600sm5p56zzpfaw";
+        $client = new ApiClient();
+
+        $response = $client->post("https://api.ultramsg.com/{$instance_id}/messages/chat", [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Authorization' => "Bearer {$api_token}",
+            ],
+            'json' => [
+                'token' => $api_token,
+                'to' => $phone,
+                'body' => $message,
+            ]
+        ]);
+
+        return true;
+
+    }
     public function user_table ( $req ) {
+
+        $location = $this->get_location("{$req->street}, {$req->city}, {$req->country}");
 
         $data = [
             'name' => $this->string($req->name),
@@ -174,9 +227,9 @@ abstract class Controller {
             'country' => $this->string($req->country),
             'city' => $this->string($req->city),
             'street' => $this->string($req->street),
-            'location' => $this->string($req->location),
-            'longitude' => $this->string($req->longitude),
-            'latitude' => $this->string($req->latitude),
+            'location' => "{$req->street}, {$req->city}, {$req->country}",
+            'longitude' => $location['longitude'],
+            'latitude' => $location['latitude'],
             'currency' => $this->string($req->currency),
             'notes' => $this->string($req->notes),
             'allow_categories' => $this->bool($req->allow_categories),
@@ -214,9 +267,9 @@ abstract class Controller {
             'agent' => $req->userAgent(),
         ];
 
-        if ( $creator === 'admin' ) $inputs['admin_id'] = $this->user()?->id;
-        if ( $creator === 'vendor' ) $inputs['vendor_id'] = $this->user()?->id;
-        if ( $creator === 'client' ) $inputs['client_id'] = $this->user()?->id;
+        if ( $creator === 'admin' ) $inputs['admin_id'] = $this->user()?->id ?? 0;
+        if ( $creator === 'vendor' ) $inputs['vendor_id'] = $this->user()?->id ?? 0;
+        if ( $creator === 'client' ) $inputs['client_id'] = $this->user()?->id ?? 0;
 
         $report = Report::create($inputs + $data);
         $report = ReportResource::make( $report );
@@ -320,39 +373,6 @@ abstract class Controller {
         ];
 
         return $data;
-
-    }
-    public function send_sms ( $phone, $message ) {
-
-        $api_key = "7019ef4b";
-        $sec_key = "q8SVI6913VMfCyR5";
-        $company = "Microtech";
-        $basic  = new Basic($api_key, $sec_key);
-        $client = new Client($basic);
-        $response = $client->sms()->send(new SMS($phone, $company, $message));
-
-        return true;
-
-    }
-    public function send_whatsapp ( $phone, $message ) {
-
-        $instance_id = "instance89613";
-        $api_token = "a600sm5p56zzpfaw";
-        $client = new ApiClient();
-
-        $response = $client->post("https://api.ultramsg.com/{$instance_id}/messages/chat", [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Authorization' => "Bearer {$api_token}",
-            ],
-            'json' => [
-                'token' => $api_token,
-                'to' => $phone,
-                'body' => $message,
-            ]
-        ]);
-
-        return true;
 
     }
 

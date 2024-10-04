@@ -53,7 +53,11 @@ class SearchController extends Controller {
         else if ( $req->sorted === 'review' ) $query = $query->withCount('reviews')->orderBy('reviews_count', 'desc');
         else if ( $req->sorted === 'rate' ) $query = $query->withAvg('reviews', 'rate')->orderBy('reviews_avg_rate', 'desc');
         
-        $query = $query->where('active', true);
+        $query = $query->where('active', true)
+            ->where('allow', true)
+            ->whereHas('vendor', function( $q ) { $q->where('active', true); })
+            ->whereHas('category', function( $q ) { $q->where('active', true); });
+
         $total = $query->count();
         $items = $query->forPage($req->page ?? 1, $req->limit ?? 12)->get();
         return ['items' => $items, 'total' => $total];

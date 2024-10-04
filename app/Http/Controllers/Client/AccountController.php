@@ -18,6 +18,7 @@ class AccountController extends Controller {
     }
     public function save ( Request $req ) {
 
+        $location = $this->get_location("{$req->street}, {$req->city}, {$req->country}");
         $user = $this->user();
 
         $validator = Validator::make($req->all(), [
@@ -46,8 +47,10 @@ class AccountController extends Controller {
             'country' => $this->string($req->country),
             'city' => $this->string($req->city),
             'street' => $this->string($req->street),
-            'location' => $this->string($req->location),
+            'location' => "{$req->street}, {$req->city}, {$req->country}",
             'currency' => $this->string($req->currency),
+            'longitude' => $this->string($req->longitude) ?? $location['longitude'],
+            'latitude' => $this->string($req->latitude) ?? $location['latitude'],
         ];
 
         $user->update($data);
