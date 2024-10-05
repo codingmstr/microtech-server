@@ -20,21 +20,22 @@ class DatabaseSeeder extends Seeder {
     public function run () {
 
         User::factory()->super()->create();
-        User::factory()->supervisor()->create();
-        User::factory()->admin()->create();
-        User::factory()->vendor()->create();
-        User::factory()->client()->create();
-        Category::factory()->create();
-        Product::factory()->create();
-        Coupon::factory()->create();
-        Order::factory()->create();
-        Review::factory()->create();
-        Blog::factory()->create();
-        Comment::factory()->create();
-        Reply::factory()->create();
-        Contact::factory()->create();
-        Mail::factory()->create();
         Setting::factory()->create();
+
+        // User::factory()->supervisor()->create();
+        // User::factory()->admin()->create();
+        // User::factory()->vendor()->create();
+        // User::factory()->client()->create();
+        // Category::factory()->create();
+        // Product::factory()->create();
+        // Coupon::factory()->create();
+        // Order::factory()->create();
+        // Review::factory()->create();
+        // Blog::factory()->create();
+        // Comment::factory()->create();
+        // Reply::factory()->create();
+        // Contact::factory()->create();
+        // Mail::factory()->create();
 
     }
 
