@@ -254,9 +254,22 @@ Route::prefix('admin')->group(function(){
                 Route::post('delete', 'App\Http\Controllers\Admin\ClientController@delete_group');
 
                 Route::prefix('{user}')->group(function(){
+
                     Route::post('', 'App\Http\Controllers\Admin\ClientController@show');
                     Route::post('update', 'App\Http\Controllers\Admin\ClientController@update');
                     Route::post('delete', 'App\Http\Controllers\Admin\ClientController@delete');
+
+                    Route::middleware('clients_wallet')->group(function(){
+
+                        Route::prefix('wallet')->group(function(){
+                            Route::post('', 'App\Http\Controllers\Admin\WalletController@index');
+                            Route::post('deposit', 'App\Http\Controllers\Admin\WalletController@deposit');
+                            Route::post('withdraw', 'App\Http\Controllers\Admin\WalletController@withdraw');
+                            Route::post('convert', 'App\Http\Controllers\Admin\WalletController@convert');
+                        });
+
+                    });
+
                 });
 
             });
@@ -271,9 +284,22 @@ Route::prefix('admin')->group(function(){
                 Route::post('delete', 'App\Http\Controllers\Admin\VendorController@delete_group');
 
                 Route::prefix('{user}')->group(function(){
+
                     Route::post('', 'App\Http\Controllers\Admin\VendorController@show');
                     Route::post('update', 'App\Http\Controllers\Admin\VendorController@update');
                     Route::post('delete', 'App\Http\Controllers\Admin\VendorController@delete');
+
+                    Route::middleware('vendors_wallet')->group(function(){
+
+                        Route::prefix('wallet')->group(function(){
+                            Route::post('', 'App\Http\Controllers\Admin\WalletController@index');
+                            Route::post('deposit', 'App\Http\Controllers\Admin\WalletController@deposit');
+                            Route::post('withdraw', 'App\Http\Controllers\Admin\WalletController@withdraw');
+                            Route::post('convert', 'App\Http\Controllers\Admin\WalletController@convert');
+                        });
+
+                    });
+
                 });
 
             });
@@ -397,5 +423,4 @@ Route::prefix('client')->group(function(){
 
 });
 
-// user ( postal field )
 // bookings histofy
