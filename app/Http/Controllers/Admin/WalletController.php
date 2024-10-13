@@ -15,6 +15,7 @@ class WalletController extends Controller {
             'withdraw_balance' => $user->withdraw_balance,
             'withdraws' => $user->withdraws,
             'deposits' => $user->deposits,
+            'balance' => $user->withdraw_balance + $user->pending_balance + $user->buy_balance,
         ];
 
     }

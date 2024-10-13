@@ -59,9 +59,22 @@ class OrderController extends Controller {
         }
         if ( $this->bool($req->pay_now) ) {
 
-            $balance = $this->user()->balance;
+            $balance = $this->user()->buy_balance + $this->user()->withdraw_balance;
             if ( $price > $balance ) return $this->failed(['balance' => 'not enouph']);
-            $this->user()->update(['balance' => $balance - $price]);
+
+            if ( $this->user()->buy_balance < $price ) {
+
+                $buy_price = $price - $this->user()->buy_balance;
+                $this->user()->update(['withdraw_balance' => $this->user()->withdraw_balance - $buy_price]);
+                $this->user()->update(['buy_balance' => 0]);
+
+            }
+            else {
+                
+                $this->user()->update(['buy_balance' => $this->user()->buy_balance - $price]);
+
+            }
+
             $paid = true;
             $paid_at = date('Y-m-d H:i:s');
 

@@ -422,5 +422,3 @@ Route::prefix('client')->group(function(){
     });
 
 });
-
-// bookings histofy

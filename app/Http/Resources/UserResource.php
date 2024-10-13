@@ -36,6 +36,7 @@ class UserResource extends JsonResource {
             'withdraw_balance' => $this->withdraw_balance,
             'pending_balance' => $this->pending_balance,
             'buy_balance' => $this->buy_balance,
+            'balance' => $this->withdraw_balance + $this->pending_balance + $this->buy_balance,
             'withdraws' => $this->withdraws,
             'deposits' => $this->deposits,
             'earned_points' => $this->earned_points,
