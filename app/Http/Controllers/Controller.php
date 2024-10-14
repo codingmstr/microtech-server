@@ -11,6 +11,7 @@ use App\Models\Report;
 use App\Events\Notify;
 use App\Models\User;
 use App\Models\File;
+use App\Models\Transaction;
 use DateTime;
 use Vonage\Client;
 use Vonage\Client\Credentials\Basic;
@@ -104,6 +105,11 @@ abstract class Controller {
         $values = ['true', '1', 't', 'yes', 'y', 'ya', 'yep', 'ok', 'on', 'done', 'always'];
         if ( in_array($value, $values) ) return true;
         return false;
+
+    }
+    public function bool_string ( $value ) {
+
+        return $this->bool($value) ? 'true' : 'false';
 
     }
     public function integer ( $value ) {
@@ -428,6 +434,32 @@ abstract class Controller {
         if ( $user->role === 2 ) $this->report($req, 'vendor', $user->id, 'update', 'admin');
         if ( $user->role === 3 ) $this->report($req, 'client', $user->id, 'update', 'admin');
         return $this->success();
+
+    }
+    public function deposit ( $req, $data ) {
+
+        if ( Transaction::where('transaction_id', $data['transaction_id'])->exists() ) return $this->failed();
+
+        $inputs = [
+            'user_id' => $this->user()->id,
+            'transaction_id' => $data['transaction_id'],
+            'currency' => $data['currency'],
+            'amount' => $data['amount'],
+            'payment' => $data['payment'],
+            'method' => $data['method'],
+            'type' => 'deposit',
+            'status' => 'confirmed',
+            'ip' => $req->ip(),
+            'agent' => $req->userAgent(),
+        ];
+
+        $transaction = Transaction::create($inputs);
+        $this->user()->buy_balance += $transaction->amount;
+        $this->user()->save();
+
+        $params = ['amount' => $transaction->amount, 'status' => $transaction->status];
+        $this->report($req, 'transaction', $transaction->id, 'deposit', 'client', $params);
+        return $this->success(['transaction' => $transaction]);
 
     }
 

@@ -395,6 +395,18 @@ Route::prefix('client')->group(function(){
             });
 
         });
+        Route::prefix('deposit')->group(function(){
+
+            Route::prefix('paypal')->group(function(){
+                Route::post('create', 'App\Http\Controllers\Payment\PaypalController@create');
+                Route::post('verify', 'App\Http\Controllers\Payment\PaypalController@verify');
+            });
+            Route::prefix('paymob')->group(function(){
+                Route::post('create', 'App\Http\Controllers\Payment\PaymobController@create');
+                Route::post('verify', 'App\Http\Controllers\Payment\PaymobController@verify');
+            });
+
+        });
 
     });
     Route::prefix('home')->group(function(){
@@ -422,3 +434,5 @@ Route::prefix('client')->group(function(){
     });
 
 });
+
+// paytabs
