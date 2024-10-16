@@ -395,17 +395,13 @@ Route::prefix('client')->group(function(){
             });
 
         });
-        Route::prefix('deposit')->group(function(){
-
-            Route::prefix('paypal')->group(function(){
-                Route::post('create', 'App\Http\Controllers\Payment\PaypalController@create');
-                Route::post('verify', 'App\Http\Controllers\Payment\PaypalController@verify');
-            });
-            Route::prefix('paymob')->group(function(){
-                Route::post('create', 'App\Http\Controllers\Payment\PaymobController@create');
-                Route::post('verify', 'App\Http\Controllers\Payment\PaymobController@verify');
-            });
-
+        Route::prefix('pay')->group(function(){
+            Route::post('paytabs', 'App\Http\Controllers\Payment\PaytabsController@index');
+            Route::post('paymob', 'App\Http\Controllers\Payment\PaymobController@index');
+            Route::post('paypal', 'App\Http\Controllers\Payment\PaypalController@index');
+            Route::post('crypto', 'App\Http\Controllers\Payment\CryptoController@index');
+            Route::post('vodafone', 'App\Http\Controllers\Payment\VodafoneController@index');
+            Route::post('verify', 'App\Http\Controllers\Payment\VerifyController@index');
         });
 
     });
@@ -432,7 +428,12 @@ Route::prefix('client')->group(function(){
         Route::post('', 'App\Http\Controllers\Client\OrderController@index');
         Route::post('coupon', 'App\Http\Controllers\Client\OrderController@coupon');
     });
+    Route::prefix('webhook')->group(function(){
+        Route::post('paytabs', 'App\Http\Controllers\Payment\PaytabsController@callback');
+        Route::post('paymob', 'App\Http\Controllers\Payment\PaymobController@callback');
+        Route::post('paypal', 'App\Http\Controllers\Payment\PaypalController@callback');
+        Route::post('crypto', 'App\Http\Controllers\Payment\CryptoController@callback');
+        Route::post('vodafone', 'App\Http\Controllers\Payment\VodafoneController@callback');
+    });
 
 });
-
-// paytabs

@@ -17,14 +17,12 @@ class TransactionResource extends JsonResource {
             'currency' => $this->currency,
             'amount' => $this->amount,
             'description' => $this->description,
-            'ip' => $this->ip,
-            'agent' => $this->agent,
             'status' => $this->status,
             'active' => $this->active,
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
             'user_id' => $this->user_id,
-            'user' => ProductResource::make( $this->user ),
+            'user' => UserResource::make( $this->user ),
         ];
 
     }

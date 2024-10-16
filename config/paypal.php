@@ -21,5 +21,6 @@ return [
     'notify_url'     => env('PAYPAL_NOTIFY_URL', ''),
     'locale'         => env('PAYPAL_LOCALE', 'en_US'),
     'validate_ssl'   => env('PAYPAL_VALIDATE_SSL', true),
+    'webhook_id' => env('PAYPAL_WEBHOOK_ID', ''),
 
 ];

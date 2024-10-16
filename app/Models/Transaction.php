@@ -18,8 +18,6 @@ class Transaction extends Model {
         'currency',
         'amount',
         'description',
-        'ip',
-        'agent',
         'status',
         'active',
     ];

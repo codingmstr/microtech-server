@@ -17,6 +17,7 @@ use Vonage\Client;
 use Vonage\Client\Credentials\Basic;
 use Vonage\SMS\Message\SMS;
 use GuzzleHttp\Client as ApiClient;
+use App\Events\Payment;
 
 abstract class Controller {
 
@@ -170,11 +171,26 @@ abstract class Controller {
         return date('Y-m-d H:i:s');
 
     }
+    public function exchange ( $amount, $from, $to ) {
+
+        try {
+
+            $api_key = 'e56d9853c10a15d2957053fa';
+            $url = "https://v6.exchangerate-api.com/v6/{$api_key}/latest/{$from}";
+
+            $response = json_decode( file_get_contents($url), true );
+            if( $response['result'] === 'success' ) return round( $amount * $response['conversion_rates'][$to], 2 );
+
+        } catch (\Exception $e) {}
+
+        return 0;
+
+    }
     public function get_location ( $address ) {
 
-        $client = new ApiClient();
-
         try{
+
+            $client = new ApiClient();
 
             $response = $client->get('https://nominatim.openstreetmap.org/search', [
                 'query' => ['q' => $address, 'format' => 'json', 'limit' => 1, 'accept-language' => 'ar'],
@@ -190,45 +206,56 @@ abstract class Controller {
     }
     public function send_sms ( $phone, $message ) {
 
-        $api_key = "7019ef4b";
-        $sec_key = "q8SVI6913VMfCyR5";
-        $company = "Microtech";
-        $basic  = new Basic($api_key, $sec_key);
-        $client = new Client($basic);
-        $response = $client->sms()->send(new SMS($phone, $company, $message));
+        try{
 
-        return true;
+            $api_key = "7019ef4b";
+            $sec_key = "q8SVI6913VMfCyR5";
+            $company = "Microtech";
+            $basic  = new Basic($api_key, $sec_key);
+            $client = new Client($basic);
+            $response = $client->sms()->send(new SMS($phone, $company, $message));
+            return true;
+
+        } catch (\Exception $e) {}
+
+        return false;
 
     }
     public function send_whatsapp ( $phone, $message ) {
 
-        $instance_id = "instance89613";
-        $api_token = "a600sm5p56zzpfaw";
-        $client = new ApiClient();
+        try {
 
-        $response = $client->post("https://api.ultramsg.com/{$instance_id}/messages/chat", [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Authorization' => "Bearer {$api_token}",
-            ],
-            'json' => [
-                'token' => $api_token,
-                'to' => $phone,
-                'body' => $message,
-            ]
-        ]);
+            $instance_id = "instance89613";
+            $api_token = "a600sm5p56zzpfaw";
+            $client = new ApiClient();
 
-        return true;
+            $response = $client->post("https://api.ultramsg.com/{$instance_id}/messages/chat", [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => "Bearer {$api_token}",
+                ],
+                'json' => [
+                    'token' => $api_token,
+                    'to' => $phone,
+                    'body' => $message,
+                ]
+            ]);
+
+            return true;
+
+        } catch (\Exception $e) {}
+        
+        return false;
 
     }
-    public function report ( $req, $table='', $column=0, $process='', $creator='', $data=[] ) {
+    public function report ( $req='', $table='', $column=0, $process='', $creator='', $data=[] ) {
 
         $inputs = [
             'table' => $table,
             'column' => $column,
             'process' => $process,
-            'ip' => $req->ip(),
-            'agent' => $req->userAgent(),
+            'ip' => $req?->ip(),
+            'agent' => $req?->userAgent(),
         ];
 
         if ( $creator === 'admin' ) $inputs['admin_id'] = $this->user()?->id ?? 0;
@@ -436,30 +463,28 @@ abstract class Controller {
         return $this->success();
 
     }
-    public function deposit ( $req, $data ) {
+    public function transaction ( $data ) {
 
-        if ( Transaction::where('transaction_id', $data['transaction_id'])->exists() ) return $this->failed();
+        $transaction = Transaction::where('transaction_id', $data['transaction_id'])
+            ->where('payment', $data['payment'])
+            ->where('status', 'pending')
+            ->where('active', true)
+            ->firstOrFail();
 
-        $inputs = [
-            'user_id' => $this->user()->id,
-            'transaction_id' => $data['transaction_id'],
+        $user = User::findOrFail($transaction->user_id);
+        if ( $data['completed'] ) $user->update(['buy_balance' => $user->buy_balance + $data['amount'] ]);
+
+        $transaction->update([
             'currency' => $data['currency'],
             'amount' => $data['amount'],
             'payment' => $data['payment'],
             'method' => $data['method'],
-            'type' => 'deposit',
-            'status' => 'confirmed',
-            'ip' => $req->ip(),
-            'agent' => $req->userAgent(),
-        ];
+            'status' => $data['completed'] ? 'successful' : 'failed',
+        ]);
 
-        $transaction = Transaction::create($inputs);
-        $this->user()->buy_balance += $transaction->amount;
-        $this->user()->save();
-
-        $params = ['amount' => $transaction->amount, 'status' => $transaction->status];
-        $this->report($req, 'transaction', $transaction->id, 'deposit', 'client', $params);
-        return $this->success(['transaction' => $transaction]);
+        event(new Payment($user->id, $transaction));
+        $params = ['client_id' => $user->id, 'amount' => $transaction->amount, 'status' => $transaction->status];
+        $this->report(null, 'transaction', $transaction->id, 'deposit', '', $params);
 
     }
 
