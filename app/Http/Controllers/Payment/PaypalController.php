@@ -11,6 +11,7 @@ class PaypalController extends Controller {
 
     protected $provider;
     protected $webhook_id;
+    protected $callback_url;
 
     public function __construct () {
 
@@ -19,6 +20,7 @@ class PaypalController extends Controller {
         $provider->getAccessToken();
         $this->provider = $provider;
         $this->webhook_id = config('paypal.webhook_id');
+        $this->callback_url = env('WEBHOOK_ENDPOINT') . 'paypal';
 
     }
     public function index ( Request $req ) {
@@ -38,8 +40,15 @@ class PaypalController extends Controller {
                 ],
             ],
         ]);
+        Transaction::create([
+            'user_id' => $this->user()->id,
+            'transaction_id' => $response['id'],
+            'amount' => $req->amount,
+            'currency' => 'USD',
+            'payment' => 'paypal',
+            'method' => 'wallet',
+        ]);
 
-        Transaction::create(['user_id' => $this->user()->id, 'transaction_id' => $response['id'], 'payment' => 'paypal']);
         return $this->success(['url' => $response['links'][1]['href']]);
 
     }
@@ -67,13 +76,9 @@ class PaypalController extends Controller {
         
         $data = [
             'transaction_id' => $response['id'],
-            'currency' => $response['purchase_units'][0]['payments']['captures'][0]['seller_receivable_breakdown']['net_amount']['currency_code'],
-            'amount' => $response['purchase_units'][0]['payments']['captures'][0]['seller_receivable_breakdown']['net_amount']['value'],
-            'completed' => $response['status'] === 'COMPLETED',
-            'payment' => 'paypal',
-            'method' => 'wallet',
+            'completed' => $response['status'] === 'COMPLETED'
         ];
-
+        
         $this->transaction( $data );
 
     }

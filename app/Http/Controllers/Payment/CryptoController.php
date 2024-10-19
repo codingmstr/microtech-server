@@ -6,26 +6,46 @@ use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use App\Models\Transaction;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class CryptoController extends Controller {
 
     protected $client;
     protected $apiKey;
     protected $baseUrl;
+    protected $merchantId;
     protected $callback_url;
 
     public function __construct () {
 
         $this->client = new Client();
-        $this->apiKey = '70bc6866212dfe461689fc7cc042774f87341f32';
-        $this->baseUrl = 'https://api.cryptomus.com/v1/';
-        // $this->callback_url = url('/') . '/api/client/webhook/paytabs';
-        $this->callback_url = 'https://c0c4-102-184-124-126.ngrok-free.app/api/client/webhook/paytabs';
+        $this->baseUrl = 'https://api.cryptomus.com/v1';
+        $this->apiKey = '';
+        $this->merchantId = '656a7538-3602-49c1-887e-b170f5157a98';
+        $this->callback_url = env('WEBHOOK_ENDPOINT') . 'crypto';
 
     }
     public function index ( Request $req ) {
 
-        return $this->success(['url' => 'https://cryptomus.com']);
+        $response = $this->client->post("{$this->baseUrl}/payment", [
+            'json' => [
+                'order_id' => uniqid(),
+                'amount' => $req->amount,
+                'currency' => 'USD',
+                'callback_url' => $this->callback_url,
+                'success_url' => $req->redirect_url,
+                'cancel_url' => $req->cancel_url,
+            ],
+            'headers' => [
+                'sign' => $this->apiKey,
+                'merchant' => $this->merchantId,
+                'Content-Type' => 'application/json'
+            ],
+        ]);
+
+        $response = json_decode($response->getBody()->getContents(), true);
+
+        return $this->success(['url' => 'https://cryptomus.com', 'response' => $response]);
 
     }
     public function is_valid ( $req ) {

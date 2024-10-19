@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 use App\Models\Transaction;
 use App\Models\User;
-use Illuminate\Support\Facades\Storage;
 
 class PaymobController extends Controller {
 
@@ -16,6 +15,7 @@ class PaymobController extends Controller {
     protected $iframeId;
     protected $hmacSecret;
     protected $apiBaseUrl;
+    protected $callback_url;
 
     public function __construct () {
 
@@ -25,6 +25,7 @@ class PaymobController extends Controller {
         $this->apiKey = env('PAYMOB_API_KEY');
         $this->apiBaseUrl = env('PAYMOB_API_BASE_URL');
         $this->hmacSecret = env('PAYMOB_HMAC_SECRET');
+        $this->callback_url = env('WEBHOOK_ENDPOINT') . 'paymob';
 
     }
     public function index ( Request $req ) {
@@ -70,7 +71,15 @@ class PaymobController extends Controller {
         $payment_token = json_decode($response->getBody()->getContents(), true)['token'];
         $url = "https://accept.paymobsolutions.com/api/acceptance/iframes/{$this->iframeId}?payment_token=$payment_token";
 
-        Transaction::create(['user_id' => $this->user()->id, 'transaction_id' => $merchant['id'], 'payment' => 'paymob']);
+        Transaction::create([
+            'user_id' => $this->user()->id,
+            'transaction_id' => $merchant['id'],
+            'amount' => $req->amount,
+            'currency' => 'EGP',
+            'payment' => 'paymob',
+            'method' => 'card',
+        ]);
+
         return $this->success(['url' => $url, 'transaction_id' => $merchant['id']]);
 
     }
@@ -112,16 +121,8 @@ class PaymobController extends Controller {
 
         if ( !self::is_valid( $req ) ) return;
 
-        $data = [
-            'transaction_id' => $req->obj['order']['id'],
-            'currency' => $req->obj['currency'],
-            'amount' => floor( $this->exchange($req->obj['amount_cents'] / 100, 'EGP', 'USD') ),
-            // 'completed' => $req->success,
-            'completed' => true,
-            'payment' => 'paymob',
-            'method' => 'visa',
-        ];
-
+        // $data = ['transaction_id' => $req->obj['order']['id'], 'completed' => $req->success];
+        $data = ['transaction_id' => $req->obj['order']['id'], 'completed' => true];
         $this->transaction( $data );
 
     }

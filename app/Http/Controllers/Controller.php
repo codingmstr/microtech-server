@@ -466,23 +466,16 @@ abstract class Controller {
     public function transaction ( $data ) {
 
         $transaction = Transaction::where('transaction_id', $data['transaction_id'])
-            ->where('payment', $data['payment'])
             ->where('status', 'pending')
             ->where('active', true)
             ->firstOrFail();
 
         $user = User::findOrFail($transaction->user_id);
-        if ( $data['completed'] ) $user->update(['buy_balance' => $user->buy_balance + $data['amount'] ]);
+        if ( $data['completed'] ) $user->update(['buy_balance' => $user->buy_balance + $transaction->amount ]);
 
-        $transaction->update([
-            'currency' => $data['currency'],
-            'amount' => $data['amount'],
-            'payment' => $data['payment'],
-            'method' => $data['method'],
-            'status' => $data['completed'] ? 'successful' : 'failed',
-        ]);
-
+        $transaction->update(['status' => $data['completed'] ? 'successful' : 'failed']);
         event(new Payment($user->id, $transaction));
+        
         $params = ['client_id' => $user->id, 'amount' => $transaction->amount, 'status' => $transaction->status];
         $this->report(null, 'transaction', $transaction->id, 'deposit', '', $params);
 

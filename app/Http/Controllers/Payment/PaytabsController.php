@@ -18,10 +18,10 @@ class PaytabsController extends Controller {
     public function __construct () {
 
         $this->client = new Client();
-        $this->profileId = 138225;
-        $this->serverKey = 'SKJ9NDJRD2-JJL9HGTLBM-ZGKRDR6BDR';
-        $this->baseUrl = 'https://secure-egypt.paytabs.com/';
-        $this->callback_url = url('/') . '/api/client/webhook/paytabs';
+        $this->profileId = env('PAYTABS_PROFILE_ID');
+        $this->serverKey = env('PAYTABS_SERVER_KEY');
+        $this->baseUrl = env('PAYTABS_API_URL');
+        $this->callback_url = env('WEBHOOK_ENDPOINT') . 'paytabs';
 
     }
     public function index ( Request $req ) {
@@ -30,14 +30,14 @@ class PaytabsController extends Controller {
             'profile_id' => $this->profileId,
             "cart_id"=> uniqid(),
             'cart_amount' => $req->amount,
-            "return"=> $req->redirect_url,
-            "callback"=> $this->callback_url,
-            "cart_currency"=> "USD",
-            "paypage_lang"=> "en",
-            "tran_type"=> "sale",
-            "tran_class"=> "ecom",
-            "cart_description"=> "cart description ...",
-            "customer_details"=> [
+            "return" => $req->redirect_url,
+            "callback" => $this->callback_url,
+            "cart_currency" => "USD",
+            "paypage_lang" => "en",
+            "tran_type" => "sale",
+            "tran_class" => "ecom",
+            "cart_description" => "Cart description ...",
+            "customer_details" => [
                 "name"=> "Coding Master",
                 "email"=> "codingmaster@gmail.com",
                 "phone"=> "01099188572",
@@ -47,7 +47,7 @@ class PaytabsController extends Controller {
                 "country"=> "EG",
                 "zip"=> "13713"
             ],
-            "shipping_details"=> [
+            "shipping_details" => [
                 "name"=> "product name",
                 "email"=> "codingmaster@gmail.com",
                 "phone"=> "01099188572",
@@ -64,7 +64,15 @@ class PaytabsController extends Controller {
         ]);
         $response = json_decode($response->getBody()->getContents(), true);
         
-        Transaction::create(['user_id' => $this->user()->id, 'transaction_id' => $response['tran_ref'], 'payment' => 'paytabs']);
+        Transaction::create([
+            'user_id' => $this->user()->id,
+            'transaction_id' => $response['tran_ref'],
+            'amount' => $req->amount,
+            'currency' => 'USD',
+            'payment' => 'paytabs',
+            'method' => 'card',
+        ]);
+
         return $this->success(['url' => $response['redirect_url'], 'transaction_id' => $response['tran_ref']]);
 
     }
@@ -85,13 +93,9 @@ class PaytabsController extends Controller {
         
         $data = [
             'transaction_id' => $response['tran_ref'],
-            'currency' => $response['cart_currency'],
-            'amount' => $response['cart_amount'],
-            'completed' => $response['payment_result']['response_status'] === 'A',
-            'payment' => 'paytabs',
-            'method' => 'visa',
+            'completed' => $response['payment_result']['response_status'] === 'A'
         ];
-
+        
         $this->transaction( $data );
 
     }
