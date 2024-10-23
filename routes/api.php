@@ -445,3 +445,8 @@ Route::prefix('client')->group(function(){
     });
 
 });
+
+// login google
+// payments dashboard
+// realtime chat vendor
+// vendor dashboard
